@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteFacile — Créez votre site en quelques minutes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="logo">Site<span>Facile</span></div>
+
+```
+<nav>
+    <a href="#fonctionnement">Comment ça marche</a>
+    <a href="#exemple">Exemple</a>
+    <button class="nav-button" onclick="startBuilder()">Créer mon site</button>
+</nav>
+```
+
+</header>
+
+<main>
+
+```
+<!-- HERO -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="badge">
+            ✨ Créez votre site simplement
+        </div>
+
+        <h1>
+            Votre site professionnel.
+            <span>En quelques minutes.</span>
+        </h1>
+
+        <p>
+            Répondez à quelques questions et obtenez
+            une première version de votre site professionnel.
+        </p>
+
+        <div class="hero-buttons">
+            <button class="primary-button" onclick="startBuilder()">
+                Créer mon site →
+            </button>
+
+            <button class="secondary-button" onclick="scrollToExample()">
+                Voir un exemple
+            </button>
+        </div>
+
+    </div>
+
+
+    <div class="hero-preview">
+
+        <div class="browser">
+
+            <div class="browser-top">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="preview-content">
+
+                <small>EXEMPLE</small>
+
+                <h2>Salon Élégance</h2>
+
+                <p>Coiffeur à Arras</p>
+
+                <div class="preview-services">
+                    <div>Coupe homme <strong>20 €</strong></div>
+                    <div>Barbe <strong>15 €</strong></div>
+                    <div>Coupe + barbe <strong>30 €</strong></div>
+                </div>
+
+                <button>Prendre rendez-vous</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- COMMENT ÇA MARCHE -->
+
+<section class="steps" id="fonctionnement">
+
+    <div class="section-heading">
+
+        <span>COMMENT ÇA MARCHE ?</span>
+
+        <h2>
+            Un site professionnel,
+            sans prise de tête.
+        </h2>
+
+    </div>
+
+
+    <div class="steps-grid">
+
+        <div class="step">
+
+            <div class="step-number">01</div>
+
+            <h3>Parlez-nous de votre activité</h3>
+
+            <p>
+                Indiquez votre métier, votre entreprise
+                et vos services.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-number">02</div>
+
+            <h3>Personnalisez votre site</h3>
+
+            <p>
+                Choisissez votre style et ajoutez
+                vos photos.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-number">03</div>
+
+            <h3>Votre site est prêt</h3>
+
+            <p>
+                Visualisez immédiatement le résultat
+                et préparez sa publication.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- EXEMPLE -->
+
+<section class="example-section" id="exemple">
+
+    <div class="example-text">
+
+        <span>UN APERÇU</span>
+
+        <h2>
+            Imaginez votre entreprise
+            avec son propre site.
+        </h2>
+
+        <p>
+            Une présentation claire de votre activité,
+            vos services, vos coordonnées et vos photos.
+        </p>
+
+        <button class="primary-button" onclick="startBuilder()">
+            Créer mon site →
+        </button>
+
+    </div>
+
+
+    <div class="example-card">
+
+        <div class="example-header">
+            <strong>Salon Élégance</strong>
+            <span>ARRAS</span>
+        </div>
+
+        <div class="example-image">
+            ✂️
+        </div>
+
+        <h3>Votre style. Votre entreprise.</h3>
+
+        <p>
+            Découvrez nos prestations et prenez
+            rendez-vous facilement.
+        </p>
+
+        <button>Découvrir</button>
+
+    </div>
+
+</section>
+
+
+<!-- BUILDER -->
+
+<section class="builder hidden" id="builder">
+
+    <div class="builder-container">
+
+        <div class="builder-header">
+
+            <span class="builder-label">
+                CRÉATION DE VOTRE SITE
+            </span>
+
+            <h2>Commençons par votre activité.</h2>
+
+            <p>
+                Quelques informations suffisent pour commencer.
+            </p>
+
+        </div>
+
+
+        <div class="progress">
+
+            <div class="progress-bar">
+                <div id="progressFill"></div>
+            </div>
+
+            <span id="progressText">Étape 1 / 6</span>
+
+        </div>
+
+
+        <!-- STEP 1 -->
+
+        <div class="builder-step active" id="step1">
+
+            <h3>Quel est votre métier ?</h3>
+
+            <p class="step-description">
+                Choisissez l'activité qui correspond le mieux
+                à votre entreprise.
+            </p>
+
+
+            <div class="activity-grid">
+
+                <button onclick="selectActivity(this, 'Coiffeur')">
+                    💇 Coiffeur
+                </button>
+
+                <button onclick="selectActivity(this, 'Restaurant')">
+                    🍽️ Restaurant
+                </button>
+
+                <button onclick="selectActivity(this, 'Esthéticienne')">
+                    💅 Esthéticienne
+                </button>
+
+                <button onclick="selectActivity(this, 'Artisan')">
+                    🔨 Artisan
+                </button>
+
+                <button onclick="selectActivity(this, 'Garage')">
+                    🚗 Garage
+                </button>
+
+                <button onclick="selectActivity(this, 'Coach sportif')">
+                    🏋️ Coach sportif
+                </button>
+
+                <button onclick="selectActivity(this, 'Photographe')">
+                    📷 Photographe
+                </button>
+
+                <button onclick="selectActivity(this, 'Autre')">
+                    ✨ Autre
+                </button>
+
+            </div>
+
+
+            <input
+                type="text"
+                id="customActivity"
+                placeholder="Ou écrivez votre activité..."
+            />
+
+
+            <button class="next-button" onclick="nextStep()">
+                Continuer →
+            </button>
+
+        </div>
+
+
+        <!-- STEP 2 -->
+
+        <div class="builder-step" id="step2">
+
+            <h3>Parlez-nous de votre entreprise</h3>
+
+            <div class="form-grid">
+
+                <input
+                    type="text"
+                    id="businessName"
+                    placeholder="Nom de votre entreprise *"
+                >
+
+                <input
+                    type="text"
+                    id="city"
+                    placeholder="Ville *"
+                >
+
+                <input
+                    type="text"
+                    id="address"
+                    placeholder="Adresse"
+                >
+
+                <input
+                    type="tel"
+                    id="phone"
+                    placeholder="Téléphone"
+                >
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Email"
+                >
+
+                <input
+                    type="text"
+                    id="social"
+                    placeholder="Instagram / Facebook (facultatif)"
+                >
+
+            </div>
+
+
+            <div class="builder-buttons">
+
+                <button class="back-button" onclick="previousStep()">
+                    ← Retour
+                </button>
+
+                <button class="next-button" onclick="nextStep()">
+                    Continuer →
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- STEP 3 -->
+
+        <div class="builder-step" id="step3">
+
+            <h3>Quels sont vos services ?</h3>
+
+            <p class="step-description">
+                Ajoutez les prestations proposées par votre entreprise.
+            </p>
+
+
+            <div id="servicesList"></div>
+
+
+            <button class="add-service" onclick="addService()">
+                + Ajouter une prestation
+            </button>
+
+
+            <div class="builder-buttons">
+
+                <button class="back-button" onclick="previousStep()">
+                    ← Retour
+                </button>
+
+                <button class="next-button" onclick="nextStep()">
+                    Continuer →
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- STEP 4 -->
+
+        <div class="builder-step" id="step4">
+
+            <h3>Choisissez votre style</h3>
+
+            <p class="step-description">
+                Quel style correspond le mieux à votre entreprise ?
+            </p>
+
+
+            <div class="style-grid">
+
+                <button onclick="selectStyle(this, 'Moderne')">
+                    <strong>Moderne</strong>
+                    <span>Simple et actuel</span>
+                </button>
+
+                <button onclick="selectStyle(this, 'Élégant')">
+                    <strong>Élégant</strong>
+                    <span>Sobre et raffiné</span>
+                </button>
+
+                <button onclick="selectStyle(this, 'Minimaliste')">
+                    <strong>Minimaliste</strong>
+                    <span>Clair et épuré</span>
+                </button>
+
+                <button onclick="selectStyle(this, 'Coloré')">
+                    <strong>Coloré</strong>
+                    <span>Vivant et original</span>
+                </button>
+
+            </div>
+
+
+            <div class="builder-buttons">
+
+                <button class="back-button" onclick="previousStep()">
+                    ← Retour
+                </button>
+
+                <button class="next-button" onclick="nextStep()">
+                    Continuer →
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- STEP 5 -->
+
+        <div class="builder-step" id="step5">
+
+            <h3>Ajoutez vos photos</h3>
+
+            <p class="step-description">
+                Ajoutez quelques images pour personnaliser votre site.
+            </p>
+
+
+            <div class="upload-box">
+
+                <div class="upload-icon">📸</div>
+
+                <p>
+                    Sélectionnez vos photos
+                </p>
+
+                <input
+                    type="file"
+                    id="images"
+                    accept="image/*"
+                    multiple
+                    onchange="previewImages(event)"
+                >
+
+            </div>
+
+
+            <div id="imagePreview"></div>
+
+
+            <div class="builder-buttons">
+
+                <button class="back-button" onclick="previousStep()">
+                    ← Retour
+                </button>
+
+                <button class="next-button" onclick="nextStep()">
+                    Voir mon site →
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- STEP 6 -->
+
+        <div class="builder-step" id="step6">
+
+            <h3>Votre site est prêt 🎉</h3>
+
+            <p class="step-description">
+                Voici un premier aperçu de votre site.
+            </p>
+
+
+            <div id="generatedSite"></div>
+
+
+            <div class="builder-buttons">
+
+                <button class="back-button" onclick="previousStep()">
+                    ← Modifier
+                </button>
+
+                <button class="publish-button" onclick="publishSite()">
+                    🚀 Publier mon site
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+```
+
+</main>
+
+<footer>
+
+```
+<strong>SiteFacile</strong>
+
+<p>
+    Créez votre présence en ligne simplement.
+</p>
+```
+
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
