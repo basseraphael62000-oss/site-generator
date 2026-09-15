@@ -36,7 +36,7 @@ export default {
       });
     }
 
-    // Création de site - étape de test
+    // Création de site
     if (url.pathname === "/api/create-site") {
       if (request.method !== "POST") {
         return jsonResponse(
@@ -68,29 +68,58 @@ export default {
           );
         }
 
+        // Création d'un identifiant simple pour le site
+        const siteId =
+          businessName
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "") +
+          "-" +
+          Date.now();
+
+        // Données du site à sauvegarder
+        const siteData = {
+          id: siteId,
+          businessName,
+          city,
+          services,
+          activity: data.activity || "",
+          address: data.address || "",
+          phone: data.phone || "",
+          email: data.email || "",
+          social: data.social || "",
+          style: data.style || "",
+          images: data.images || [],
+          createdAt: new Date().toISOString()
+        };
+
+        // Enregistrement dans R2
+        await env.SITE_STORAGE.put(
+          `sites/${siteId}.json`,
+          JSON.stringify(siteData, null, 2),
+          {
+            httpMetadata: {
+              contentType: "application/json"
+            }
+          }
+        );
+
         return jsonResponse({
           success: true,
-          message: "Données reçues par SiteFacile",
-          site: {
-            businessName,
-            city,
-            services,
-            activity: data.activity || "",
-            address: data.address || "",
-            phone: data.phone || "",
-            email: data.email || "",
-            social: data.social || "",
-            style: data.style || "",
-            images: data.images || []
-          }
+          message: "Site enregistré avec succès dans SiteFacile",
+          site: siteData
         });
       } catch (error) {
+        console.error("Erreur création site :", error);
+
         return jsonResponse(
           {
             success: false,
-            error: "JSON invalide"
+            error: "Impossible d'enregistrer le site."
           },
-          400
+          500
         );
       }
     }
