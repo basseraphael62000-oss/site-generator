@@ -1,3 +1,4 @@
+
 /* =========================================
 SITEFACILE — SCRIPT V1
 ========================================= */
@@ -5,16 +6,16 @@ SITEFACILE — SCRIPT V1
 let currentStep = 1;
 
 let project = {
-activity: "",
-businessName: "",
-city: "",
-address: "",
-phone: "",
-email: "",
-social: "",
-services: [],
-style: "",
-images: []
+    activity: "",
+    businessName: "",
+    city: "",
+    address: "",
+    phone: "",
+    email: "",
+    social: "",
+    services: [],
+    style: "",
+    images: []
 };
 
 /* =========================================
@@ -22,17 +23,13 @@ INITIALISATION
 ========================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
+    loadProject();
 
-```
-loadProject();
+    if (project.services.length === 0) {
+        addService();
+    }
 
-if (project.services.length === 0) {
-    addService();
-}
-
-updateProgress();
-```
-
+    updateProgress();
 });
 
 /* =========================================
@@ -40,19 +37,20 @@ DÉMARRER LE BUILDER
 ========================================= */
 
 function startBuilder() {
+    const builder = document.getElementById("builder");
 
-```
-const builder = document.getElementById("builder");
+    if (!builder) {
+        console.error("L'élément #builder est introuvable.");
+        return;
+    }
 
-builder.classList.remove("hidden");
+    builder.classList.remove("hidden");
 
-setTimeout(() => {
-    builder.scrollIntoView({
-        behavior: "smooth"
-    });
-}, 50);
-```
-
+    setTimeout(() => {
+        builder.scrollIntoView({
+            behavior: "smooth"
+        });
+    }, 50);
 }
 
 /* =========================================
@@ -60,13 +58,13 @@ SCROLL EXEMPLE
 ========================================= */
 
 function scrollToExample() {
+    const exemple = document.getElementById("exemple");
 
-```
-document.getElementById("exemple").scrollIntoView({
-    behavior: "smooth"
-});
-```
-
+    if (exemple) {
+        exemple.scrollIntoView({
+            behavior: "smooth"
+        });
+    }
 }
 
 /* =========================================
@@ -74,21 +72,21 @@ ACTIVITÉ
 ========================================= */
 
 function selectActivity(button, activity) {
+    document
+        .querySelectorAll(".activity-grid button")
+        .forEach(btn => btn.classList.remove("selected"));
 
-```
-document
-    .querySelectorAll(".activity-grid button")
-    .forEach(btn => btn.classList.remove("selected"));
+    button.classList.add("selected");
 
-button.classList.add("selected");
+    project.activity = activity;
 
-project.activity = activity;
+    const customActivity = document.getElementById("customActivity");
 
-document.getElementById("customActivity").value = "";
+    if (customActivity) {
+        customActivity.value = "";
+    }
 
-saveProject();
-```
-
+    saveProject();
 }
 
 /* =========================================
@@ -96,19 +94,15 @@ STYLE
 ========================================= */
 
 function selectStyle(button, style) {
+    document
+        .querySelectorAll(".style-grid button")
+        .forEach(btn => btn.classList.remove("selected"));
 
-```
-document
-    .querySelectorAll(".style-grid button")
-    .forEach(btn => btn.classList.remove("selected"));
+    button.classList.add("selected");
 
-button.classList.add("selected");
+    project.style = style;
 
-project.style = style;
-
-saveProject();
-```
-
+    saveProject();
 }
 
 /* =========================================
@@ -116,33 +110,25 @@ NAVIGATION ÉTAPES
 ========================================= */
 
 function nextStep() {
+    if (!validateStep(currentStep)) {
+        return;
+    }
 
-```
-if (!validateStep(currentStep)) {
-    return;
-}
+    saveCurrentStep();
 
-saveCurrentStep();
+    if (currentStep < 6) {
+        currentStep++;
+    }
 
-if (currentStep < 6) {
-    currentStep++;
-}
-
-showStep();
-```
-
+    showStep();
 }
 
 function previousStep() {
+    if (currentStep > 1) {
+        currentStep--;
+    }
 
-```
-if (currentStep > 1) {
-    currentStep--;
-}
-
-showStep();
-```
-
+    showStep();
 }
 
 /* =========================================
@@ -150,30 +136,30 @@ AFFICHER L'ÉTAPE
 ========================================= */
 
 function showStep() {
+    document
+        .querySelectorAll(".builder-step")
+        .forEach(step => step.classList.remove("active"));
 
-```
-document
-    .querySelectorAll(".builder-step")
-    .forEach(step => step.classList.remove("active"));
+    const step = document.getElementById(`step${currentStep}`);
 
-const step = document.getElementById(`step${currentStep}`);
+    if (step) {
+        step.classList.add("active");
+    }
 
-if (step) {
-    step.classList.add("active");
-}
+    updateProgress();
 
-updateProgress();
+    if (currentStep === 6) {
+        generateWebsitePreview();
+    }
 
-if (currentStep === 6) {
-    generateWebsitePreview();
-}
+    const builder = document.getElementById("builder");
 
-window.scrollTo({
-    top: document.getElementById("builder").offsetTop - 80,
-    behavior: "smooth"
-});
-```
-
+    if (builder) {
+        window.scrollTo({
+            top: builder.offsetTop - 80,
+            behavior: "smooth"
+        });
+    }
 }
 
 /* =========================================
@@ -181,23 +167,18 @@ BARRE DE PROGRESSION
 ========================================= */
 
 function updateProgress() {
+    const percentage = (currentStep / 6) * 100;
 
-```
-const percentage = (currentStep / 6) * 100;
+    const fill = document.getElementById("progressFill");
+    const text = document.getElementById("progressText");
 
-const fill = document.getElementById("progressFill");
+    if (fill) {
+        fill.style.width = `${percentage}%`;
+    }
 
-const text = document.getElementById("progressText");
-
-if (fill) {
-    fill.style.width = `${percentage}%`;
-}
-
-if (text) {
-    text.textContent = `Étape ${currentStep} / 6`;
-}
-```
-
+    if (text) {
+        text.textContent = `Étape ${currentStep} / 6`;
+    }
 }
 
 /* =========================================
@@ -205,65 +186,55 @@ VALIDATION
 ========================================= */
 
 function validateStep(step) {
+    if (step === 1) {
+        const customElement = document.getElementById("customActivity");
 
-```
-if (step === 1) {
+        const custom = customElement
+            ? customElement.value.trim()
+            : "";
 
-    const custom = document
-        .getElementById("customActivity")
-        .value
-        .trim();
+        if (custom !== "") {
+            project.activity = custom;
+        }
 
-    if (custom !== "") {
-        project.activity = custom;
+        if (!project.activity) {
+            alert("Choisissez votre activité avant de continuer.");
+            return false;
+        }
     }
 
-    if (!project.activity) {
+    if (step === 2) {
+        const businessNameElement =
+            document.getElementById("businessName");
 
-        alert("Choisissez votre activité avant de continuer.");
+        const cityElement =
+            document.getElementById("city");
 
-        return false;
+        const businessName = businessNameElement
+            ? businessNameElement.value.trim()
+            : "";
+
+        const city = cityElement
+            ? cityElement.value.trim()
+            : "";
+
+        if (!businessName || !city) {
+            alert(
+                "Veuillez renseigner le nom de votre entreprise et votre ville."
+            );
+
+            return false;
+        }
     }
 
-}
-
-
-if (step === 2) {
-
-    const businessName = document
-        .getElementById("businessName")
-        .value
-        .trim();
-
-    const city = document
-        .getElementById("city")
-        .value
-        .trim();
-
-    if (!businessName || !city) {
-
-        alert("Veuillez renseigner le nom de votre entreprise et votre ville.");
-
-        return false;
+    if (step === 4) {
+        if (!project.style) {
+            alert("Choisissez un style avant de continuer.");
+            return false;
+        }
     }
 
-}
-
-
-if (step === 4) {
-
-    if (!project.style) {
-
-        alert("Choisissez un style avant de continuer.");
-
-        return false;
-    }
-
-}
-
-return true;
-```
-
+    return true;
 }
 
 /* =========================================
@@ -271,75 +242,93 @@ SAUVEGARDER L'ÉTAPE ACTUELLE
 ========================================= */
 
 function saveCurrentStep() {
+    if (currentStep === 1) {
+        const customElement =
+            document.getElementById("customActivity");
 
-```
-if (currentStep === 1) {
+        const custom = customElement
+            ? customElement.value.trim()
+            : "";
 
-    const custom = document
-        .getElementById("customActivity")
-        .value
-        .trim();
-
-    if (custom) {
-        project.activity = custom;
+        if (custom) {
+            project.activity = custom;
+        }
     }
 
-}
+    if (currentStep === 2) {
+        const businessName =
+            document.getElementById("businessName");
 
+        const city =
+            document.getElementById("city");
 
-if (currentStep === 2) {
+        const address =
+            document.getElementById("address");
 
-    project.businessName =
-        document.getElementById("businessName").value.trim();
+        const phone =
+            document.getElementById("phone");
 
-    project.city =
-        document.getElementById("city").value.trim();
+        const email =
+            document.getElementById("email");
 
-    project.address =
-        document.getElementById("address").value.trim();
+        const social =
+            document.getElementById("social");
 
-    project.phone =
-        document.getElementById("phone").value.trim();
+        if (businessName) {
+            project.businessName = businessName.value.trim();
+        }
 
-    project.email =
-        document.getElementById("email").value.trim();
+        if (city) {
+            project.city = city.value.trim();
+        }
 
-    project.social =
-        document.getElementById("social").value.trim();
+        if (address) {
+            project.address = address.value.trim();
+        }
 
-}
+        if (phone) {
+            project.phone = phone.value.trim();
+        }
 
+        if (email) {
+            project.email = email.value.trim();
+        }
 
-if (currentStep === 3) {
+        if (social) {
+            project.social = social.value.trim();
+        }
+    }
 
-    project.services = [];
+    if (currentStep === 3) {
+        project.services = [];
 
-    document
-        .querySelectorAll(".service-row")
-        .forEach(row => {
+        document
+            .querySelectorAll(".service-row")
+            .forEach(row => {
+                const nameElement =
+                    row.querySelector(".service-name");
 
-            const name =
-                row.querySelector(".service-name").value.trim();
+                const priceElement =
+                    row.querySelector(".service-price");
 
-            const price =
-                row.querySelector(".service-price").value.trim();
+                const name = nameElement
+                    ? nameElement.value.trim()
+                    : "";
 
-            if (name) {
+                const price = priceElement
+                    ? priceElement.value.trim()
+                    : "";
 
-                project.services.push({
-                    name: name,
-                    price: price
-                });
+                if (name) {
+                    project.services.push({
+                        name: name,
+                        price: price
+                    });
+                }
+            });
+    }
 
-            }
-
-        });
-
-}
-
-saveProject();
-```
-
+    saveProject();
 }
 
 /* =========================================
@@ -347,53 +336,52 @@ SERVICES
 ========================================= */
 
 function addService(name = "", price = "") {
+    const list = document.getElementById("servicesList");
 
-```
-const list = document.getElementById("servicesList");
+    if (!list) {
+        console.error("L'élément #servicesList est introuvable.");
+        return;
+    }
 
-const row = document.createElement("div");
+    const row = document.createElement("div");
 
-row.className = "service-row";
+    row.className = "service-row";
 
-row.innerHTML = `
-    <input
-        type="text"
-        class="service-name"
-        placeholder="Nom de la prestation"
-        value="${escapeHTML(name)}"
-    >
+    row.innerHTML = `
+        <input
+            type="text"
+            class="service-name"
+            placeholder="Nom de la prestation"
+            value="${escapeHTML(name)}"
+        >
 
-    <input
-        type="text"
-        class="service-price"
-        placeholder="Prix"
-        value="${escapeHTML(price)}"
-    >
+        <input
+            type="text"
+            class="service-price"
+            placeholder="Prix"
+            value="${escapeHTML(price)}"
+        >
 
-    <button
-        class="remove-service"
-        onclick="removeService(this)"
-        type="button"
-    >
-        ×
-    </button>
-`;
+        <button
+            class="remove-service"
+            onclick="removeService(this)"
+            type="button"
+        >
+            ×
+        </button>
+    `;
 
-list.appendChild(row);
-```
-
+    list.appendChild(row);
 }
 
 function removeService(button) {
+    const row = button.parentElement;
 
-```
-const row = button.parentElement;
+    if (row) {
+        row.remove();
+    }
 
-row.remove();
-
-saveCurrentStep();
-```
-
+    saveCurrentStep();
 }
 
 /* =========================================
@@ -401,39 +389,38 @@ PHOTOS
 ========================================= */
 
 function previewImages(event) {
+    const files = event.target.files;
 
-```
-const files = event.target.files;
+    const preview =
+        document.getElementById("imagePreview");
 
-const preview = document.getElementById("imagePreview");
+    if (!preview) {
+        return;
+    }
 
-preview.innerHTML = "";
+    preview.innerHTML = "";
 
-project.images = [];
+    project.images = [];
 
-Array.from(files).forEach(file => {
+    Array.from(files).forEach(file => {
+        const reader = new FileReader();
 
-    const reader = new FileReader();
+        reader.onload = function(e) {
+            project.images.push(e.target.result);
 
-    reader.onload = function(e) {
+            const img = document.createElement("img");
 
-        project.images.push(e.target.result);
+            img.src = e.target.result;
 
-        const img = document.createElement("img");
+            img.alt = "Photo de l'entreprise";
 
-        img.src = e.target.result;
+            preview.appendChild(img);
 
-        preview.appendChild(img);
+            saveProject();
+        };
 
-        saveProject();
-
-    };
-
-    reader.readAsDataURL(file);
-
-});
-```
-
+        reader.readAsDataURL(file);
+    });
 }
 
 /* =========================================
@@ -441,121 +428,124 @@ GÉNÉRER LE SITE
 ========================================= */
 
 function generateWebsitePreview() {
+    saveCurrentStep();
 
-```
-saveCurrentStep();
+    const container =
+        document.getElementById("generatedSite");
 
-const container =
-    document.getElementById("generatedSite");
+    if (!container) {
+        console.error("L'élément #generatedSite est introuvable.");
+        return;
+    }
 
-const servicesHTML =
-    project.services.length > 0
+    const servicesHTML =
+        project.services.length > 0
+            ? project.services
+                .map(service => `
+                    <div class="generated-service">
+                        <span>
+                            ${escapeHTML(service.name)}
+                        </span>
 
-    ? project.services.map(service => `
-        <div class="generated-service">
+                        <strong>
+                            ${
+                                service.price
+                                    ? escapeHTML(service.price)
+                                    : ""
+                            }
+                        </strong>
+                    </div>
+                `)
+                .join("")
+            : `
+                <p>
+                    Ajoutez vos prestations pour les afficher ici.
+                </p>
+            `;
 
-            <span>
-                ${escapeHTML(service.name)}
-            </span>
+    const imagesHTML =
+        project.images.length > 0
+            ? `
+                <div class="generated-images">
+                    ${project.images
+                        .map(image => `
+                            <img
+                                src="${image}"
+                                alt="Photo de l'entreprise"
+                            >
+                        `)
+                        .join("")}
+                </div>
+            `
+            : "";
 
-            <strong>
-                ${service.price
-                    ? escapeHTML(service.price)
-                    : ""}
-            </strong>
+    container.innerHTML = `
+        <div class="generated-site">
 
-        </div>
-    `).join("")
+            <div class="generated-hero">
 
-    : `
-        <p>
-            Ajoutez vos prestations pour les afficher ici.
-        </p>
-    `;
+                <small>
+                    ${escapeHTML(project.activity)}
+                </small>
 
+                <h2>
+                    ${escapeHTML(project.businessName)}
+                </h2>
 
-const imagesHTML =
-    project.images.length > 0
-
-    ? `
-        <div class="generated-images">
-            ${project.images.map(image => `
-                <img src="${image}" alt="Photo de l'entreprise">
-            `).join("")}
-        </div>
-    `
-
-    : "";
-
-
-container.innerHTML = `
-
-    <div class="generated-site">
-
-        <div class="generated-hero">
-
-            <small>
-                ${escapeHTML(project.activity)}
-            </small>
-
-            <h2>
-                ${escapeHTML(project.businessName)}
-            </h2>
-
-            <p>
-                ${escapeHTML(project.city)}
-            </p>
-
-        </div>
-
-
-        <div class="generated-content">
-
-            ${imagesHTML}
-
-
-            <h3>
-                Nos prestations
-            </h3>
-
-            <div class="generated-services">
-
-                ${servicesHTML}
+                <p>
+                    ${escapeHTML(project.city)}
+                </p>
 
             </div>
 
+            <div class="generated-content">
 
-            <div class="generated-contact">
+                ${imagesHTML}
 
                 <h3>
-                    Contact
+                    Nos prestations
                 </h3>
 
-                ${project.address
-                    ? `<p>📍 ${escapeHTML(project.address)}</p>`
-                    : ""}
+                <div class="generated-services">
+                    ${servicesHTML}
+                </div>
 
-                ${project.phone
-                    ? `<p>📞 ${escapeHTML(project.phone)}</p>`
-                    : ""}
+                <div class="generated-contact">
 
-                ${project.email
-                    ? `<p>✉️ ${escapeHTML(project.email)}</p>`
-                    : ""}
+                    <h3>
+                        Contact
+                    </h3>
 
-                ${project.social
-                    ? `<p>📱 ${escapeHTML(project.social)}</p>`
-                    : ""}
+                    ${
+                        project.address
+                            ? `<p>📍 ${escapeHTML(project.address)}</p>`
+                            : ""
+                    }
+
+                    ${
+                        project.phone
+                            ? `<p>📞 ${escapeHTML(project.phone)}</p>`
+                            : ""
+                    }
+
+                    ${
+                        project.email
+                            ? `<p>✉️ ${escapeHTML(project.email)}</p>`
+                            : ""
+                    }
+
+                    ${
+                        project.social
+                            ? `<p>📱 ${escapeHTML(project.social)}</p>`
+                            : ""
+                    }
+
+                </div>
 
             </div>
 
         </div>
-
-    </div>
-
-`;
-```
-
+    `;
 }
 
 /* =========================================
@@ -563,14 +553,10 @@ PUBLICATION
 ========================================= */
 
 function publishSite() {
-
-```
-alert(
-    "🎉 Votre site est prêt !\n\n" +
-    "La publication en ligne sera disponible prochainement."
-);
-```
-
+    alert(
+        "🎉 Votre site est prêt !\n\n" +
+        "La publication en ligne sera disponible prochainement."
+    );
 }
 
 /* =========================================
@@ -578,47 +564,36 @@ LOCAL STORAGE
 ========================================= */
 
 function saveProject() {
-
-```
-localStorage.setItem(
-    "sitefacile_project",
-    JSON.stringify(project)
-);
-```
-
+    localStorage.setItem(
+        "sitefacile_project",
+        JSON.stringify(project)
+    );
 }
 
 function loadProject() {
+    const saved =
+        localStorage.getItem("sitefacile_project");
 
-```
-const saved =
-    localStorage.getItem("sitefacile_project");
+    if (!saved) {
+        return;
+    }
 
-if (!saved) {
-    return;
-}
+    try {
+        const data = JSON.parse(saved);
 
-try {
+        project = {
+            ...project,
+            ...data
+        };
 
-    const data = JSON.parse(saved);
+        restoreForm();
 
-    project = {
-        ...project,
-        ...data
-    };
-
-    restoreForm();
-
-} catch (error) {
-
-    console.error(
-        "Impossible de charger le projet.",
-        error
-    );
-
-}
-```
-
+    } catch (error) {
+        console.error(
+            "Impossible de charger le projet.",
+            error
+        );
+    }
 }
 
 /* =========================================
@@ -626,100 +601,79 @@ RESTAURER LE FORMULAIRE
 ========================================= */
 
 function restoreForm() {
+    const fields = {
+        businessName: project.businessName,
+        city: project.city,
+        address: project.address,
+        phone: project.phone,
+        email: project.email,
+        social: project.social
+    };
 
-```
-const fields = {
-    businessName: project.businessName,
-    city: project.city,
-    address: project.address,
-    phone: project.phone,
-    email: project.email,
-    social: project.social
-};
+    Object.entries(fields).forEach(([id, value]) => {
+        const element = document.getElementById(id);
 
-Object.entries(fields).forEach(([id, value]) => {
+        if (element && value) {
+            element.value = value;
+        }
+    });
 
-    const element = document.getElementById(id);
+    if (project.activity) {
+        const buttons =
+            document.querySelectorAll(".activity-grid button");
 
-    if (element && value) {
-        element.value = value;
+        buttons.forEach(button => {
+            if (button.textContent.includes(project.activity)) {
+                button.classList.add("selected");
+            }
+        });
     }
 
-});
+    if (project.style) {
+        const buttons =
+            document.querySelectorAll(".style-grid button");
 
+        buttons.forEach(button => {
+            if (button.textContent.includes(project.style)) {
+                button.classList.add("selected");
+            }
+        });
+    }
 
-if (project.activity) {
+    if (project.services.length > 0) {
+        const list =
+            document.getElementById("servicesList");
 
-    const buttons =
-        document.querySelectorAll(".activity-grid button");
+        if (list) {
+            list.innerHTML = "";
 
-    buttons.forEach(button => {
-
-        if (button.textContent.includes(project.activity)) {
-            button.classList.add("selected");
+            project.services.forEach(service => {
+                addService(
+                    service.name,
+                    service.price
+                );
+            });
         }
+    }
 
-    });
+    if (project.images.length > 0) {
+        const preview =
+            document.getElementById("imagePreview");
 
-}
+        if (preview) {
+            preview.innerHTML = "";
 
+            project.images.forEach(image => {
+                const img =
+                    document.createElement("img");
 
-if (project.style) {
+                img.src = image;
+                img.alt = "Photo de l'entreprise";
 
-    const buttons =
-        document.querySelectorAll(".style-grid button");
-
-    buttons.forEach(button => {
-
-        if (button.textContent.includes(project.style)) {
-            button.classList.add("selected");
+                preview.appendChild(img);
+            });
         }
-
-    });
-
-}
-
-
-if (project.services.length > 0) {
-
-    const list =
-        document.getElementById("servicesList");
-
-    list.innerHTML = "";
-
-    project.services.forEach(service => {
-
-        addService(
-            service.name,
-            service.price
-        );
-
-    });
-
-}
-
-
-if (project.images.length > 0) {
-
-    const preview =
-        document.getElementById("imagePreview");
-
-    preview.innerHTML = "";
-
-    project.images.forEach(image => {
-
-        const img =
-            document.createElement("img");
-
-        img.src = image;
-
-        preview.appendChild(img);
-
-    });
-
-}
-```
-
+    }
 }
 
 /* =========================================
@@ -727,14 +681,10 @@ SÉCURITÉ HTML
 ========================================= */
 
 function escapeHTML(value) {
-
-```
-return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-```
-
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
