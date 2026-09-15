@@ -13,7 +13,133 @@ function jsonResponse(data, status = 200) {
     }
   });
 }
+function generateSiteHTML(site) {
+  const servicesHTML = site.services
+    .map(service => `<li>${service}</li>`)
+    .join("");
 
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${site.businessName} - ${site.city}</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #222;
+    }
+
+    header {
+      background: #111;
+      color: white;
+      padding: 70px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 15px;
+      font-size: 42px;
+    }
+
+    header p {
+      font-size: 20px;
+      opacity: 0.85;
+    }
+
+    section {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 30px 20px;
+      background: white;
+      border-radius: 16px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin: 10px 0;
+    }
+
+    .contact {
+      text-align: center;
+    }
+
+    .contact a {
+      display: inline-block;
+      margin: 8px;
+      padding: 12px 20px;
+      background: #111;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>${site.businessName}</h1>
+    <p>${site.activity || "Bienvenue sur notre site"} · ${site.city}</p>
+  </header>
+
+  <section>
+    <h2>Nos prestations</h2>
+
+    <ul>
+      ${servicesHTML}
+    </ul>
+  </section>
+
+  <section>
+    <h2>À propos</h2>
+    <p>
+      Bienvenue chez ${site.businessName}.
+      Retrouvez-nous à ${site.city}.
+    </p>
+  </section>
+
+  <section class="contact">
+    <h2>Contact</h2>
+
+    ${site.phone
+      ? `<a href="tel:${site.phone}">📞 ${site.phone}</a>`
+      : ""}
+
+    ${site.email
+      ? `<a href="mailto:${site.email}">✉️ ${site.email}</a>`
+      : ""}
+
+    <p>${site.address || site.city}</p>
+  </section>
+
+  <footer>
+    Créé avec SiteFacile
+  </footer>
+
+</body>
+</html>`;
+}
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -105,7 +231,18 @@ export default {
             }
           }
         );
+// Génération du vrai site HTML
+const siteHTML = generateSiteHTML(siteData);
 
+await env.SITE_STORAGE.put(
+  `sites/${siteId}/index.html`,
+  siteHTML,
+  {
+    httpMetadata: {
+      contentType: "text/html; charset=utf-8"
+    }
+  }
+);
         return jsonResponse({
           success: true,
           message: "Site enregistré avec succès dans SiteFacile",
