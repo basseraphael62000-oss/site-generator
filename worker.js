@@ -14,7 +14,10 @@ function jsonResponse(data, status = 200) {
   });
 }
 
-// Protection des contenus affichés dans le HTML
+/* =========================================================
+   SÉCURITÉ
+========================================================= */
+
 function escapeHTML(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -24,7 +27,11 @@ function escapeHTML(value) {
     .replace(/'/g, "&#039;");
 }
 
-// Génération du site HTML
+
+/* =========================================================
+   GÉNÉRATION DU SITE
+========================================================= */
+
 function generateSiteHTML(site) {
 
   const businessName = escapeHTML(site.businessName);
@@ -39,6 +46,123 @@ function generateSiteHTML(site) {
 
   const phone = escapeHTML(site.phone);
   const email = escapeHTML(site.email);
+  const social = escapeHTML(site.social);
+
+  /* =======================================================
+     STYLE
+  ======================================================= */
+
+  const selectedStyle =
+    String(site.style || "Moderne")
+      .toLowerCase()
+      .trim();
+
+
+  let theme = {
+    background: "#f6f6f7",
+    surface: "#ffffff",
+    text: "#151515",
+    muted: "#777777",
+    primary: "#111111",
+    primaryText: "#ffffff",
+    border: "#e7e7e7",
+    hero: "linear-gradient(135deg, #111111, #2c2c2c)",
+    radius: "20px",
+    font: "Arial, Helvetica, sans-serif"
+  };
+
+
+  /* =======================================================
+     MODERNE
+  ======================================================= */
+
+  if (selectedStyle === "moderne") {
+
+    theme = {
+      background: "#f6f6f7",
+      surface: "#ffffff",
+      text: "#151515",
+      muted: "#777777",
+      primary: "#111111",
+      primaryText: "#ffffff",
+      border: "#e7e7e7",
+      hero: "linear-gradient(135deg, #111111, #303030)",
+      radius: "20px",
+      font: "Inter, Arial, sans-serif"
+    };
+
+  }
+
+
+  /* =======================================================
+     ÉLÉGANT
+  ======================================================= */
+
+  else if (selectedStyle === "élégant") {
+
+    theme = {
+      background: "#f5f1eb",
+      surface: "#fffdf9",
+      text: "#2a2520",
+      muted: "#766e65",
+      primary: "#6d5140",
+      primaryText: "#ffffff",
+      border: "#e6ddd3",
+      hero: "linear-gradient(135deg, #2c211b, #735641)",
+      radius: "12px",
+      font: "Georgia, 'Times New Roman', serif"
+    };
+
+  }
+
+
+  /* =======================================================
+     MINIMALISTE
+  ======================================================= */
+
+  else if (selectedStyle === "minimaliste") {
+
+    theme = {
+      background: "#ffffff",
+      surface: "#ffffff",
+      text: "#222222",
+      muted: "#888888",
+      primary: "#222222",
+      primaryText: "#ffffff",
+      border: "#eeeeee",
+      hero: "#ffffff",
+      radius: "8px",
+      font: "Arial, Helvetica, sans-serif"
+    };
+
+  }
+
+
+  /* =======================================================
+     COLORÉ
+  ======================================================= */
+
+  else if (selectedStyle === "coloré") {
+
+    theme = {
+      background: "#f5f3ff",
+      surface: "#ffffff",
+      text: "#222222",
+      muted: "#68627a",
+      primary: "#6c4cff",
+      primaryText: "#ffffff",
+      border: "#e5defc",
+      hero: "linear-gradient(135deg, #6c4cff, #d84cff)",
+      radius: "24px",
+      font: "Arial, Helvetica, sans-serif"
+    };
+
+  }
+
+
+  /* =======================================================
+     PRESTATIONS
+  ======================================================= */
 
   const servicesHTML = site.services
     .map(service => {
@@ -56,7 +180,7 @@ function generateSiteHTML(site) {
       return `
         <article class="service-card">
 
-          <div class="service-content">
+          <div class="service-info">
 
             <h3>
               ${escapeHTML(name)}
@@ -76,8 +200,100 @@ function generateSiteHTML(site) {
 
         </article>
       `;
+
     })
     .join("");
+
+
+  /* =======================================================
+     GALERIE
+  ======================================================= */
+
+  const images =
+    Array.isArray(site.images)
+      ? site.images
+      : [];
+
+
+  const galleryHTML =
+    images.length > 0
+
+      ? `
+        <section class="section gallery-section">
+
+          <div class="section-heading">
+
+            <span>
+              Galerie
+            </span>
+
+            <h2>
+              Découvrez notre univers
+            </h2>
+
+          </div>
+
+          <div class="gallery">
+
+            ${images
+              .map(image => {
+
+                const imageURL =
+                  typeof image === "string"
+                    ? image
+                    : image?.url || "";
+
+                if (!imageURL) {
+                  return "";
+                }
+
+                return `
+                  <div class="gallery-item">
+
+                    <img
+                      src="${escapeHTML(imageURL)}"
+                      alt="${businessName}"
+                      loading="lazy"
+                    >
+
+                  </div>
+                `;
+
+              })
+              .join("")}
+
+          </div>
+
+        </section>
+      `
+
+      : "";
+
+
+  /* =======================================================
+     RÉSEAUX SOCIAUX
+  ======================================================= */
+
+  const socialHTML =
+    social
+
+      ? `
+        <a
+          class="contact-button secondary"
+          href="${social}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          🌐 Réseaux sociaux
+        </a>
+      `
+
+      : "";
+
+
+  /* =======================================================
+     HTML FINAL
+  ======================================================= */
 
   return `<!DOCTYPE html>
 
@@ -97,11 +313,60 @@ function generateSiteHTML(site) {
     content="${businessName} à ${city}"
   >
 
+  <meta
+    name="theme-color"
+    content="${theme.primary}"
+  >
+
   <title>
     ${businessName} - ${city}
   </title>
 
+
   <style>
+
+    /* =====================================================
+       VARIABLES
+    ===================================================== */
+
+    :root {
+
+      --background:
+        ${theme.background};
+
+      --surface:
+        ${theme.surface};
+
+      --text:
+        ${theme.text};
+
+      --muted:
+        ${theme.muted};
+
+      --primary:
+        ${theme.primary};
+
+      --primary-text:
+        ${theme.primaryText};
+
+      --border:
+        ${theme.border};
+
+      --hero:
+        ${theme.hero};
+
+      --radius:
+        ${theme.radius};
+
+      --font:
+        ${theme.font};
+
+    }
+
+
+    /* =====================================================
+       RESET
+    ===================================================== */
 
     * {
       box-sizing: border-box;
@@ -112,261 +377,399 @@ function generateSiteHTML(site) {
     }
 
     body {
+
       margin: 0;
+
+      background:
+        var(--background);
+
+      color:
+        var(--text);
+
       font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
+        var(--font);
 
-      background: #f7f7f8;
-      color: #171717;
+      line-height:
+        1.6;
 
-      line-height: 1.6;
     }
 
-    /* =========================
+    a {
+      color: inherit;
+    }
+
+
+    /* =====================================================
        NAVIGATION
-    ========================= */
+    ===================================================== */
 
     nav {
+
       position: absolute;
+
       top: 0;
       left: 0;
+
       width: 100%;
 
-      padding: 22px 30px;
+      padding:
+        22px 30px;
 
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
 
       z-index: 10;
+
     }
 
     .logo {
+
       color: white;
+
       text-decoration: none;
 
       font-size: 20px;
+
       font-weight: 700;
 
-      letter-spacing: -0.5px;
+      letter-spacing:
+        -0.5px;
+
     }
 
     .nav-button {
+
       color: white;
+
       text-decoration: none;
 
-      padding: 9px 17px;
+      padding:
+        9px 18px;
 
-      border: 1px solid rgba(255,255,255,0.35);
+      border:
+        1px solid
+        rgba(255,255,255,0.35);
 
-      border-radius: 999px;
+      border-radius:
+        999px;
 
       font-size: 14px;
 
-      transition: 0.2s;
+      transition:
+        0.2s;
+
     }
 
     .nav-button:hover {
+
       background: white;
+
       color: #111;
+
     }
 
-    /* =========================
+
+    /* =====================================================
        HERO
-    ========================= */
+    ===================================================== */
 
     header {
-      min-height: 82vh;
+
+      min-height:
+        82vh;
 
       display: flex;
-      align-items: center;
-      justify-content: center;
 
-      text-align: center;
+      align-items:
+        center;
 
-      padding: 100px 20px 80px;
+      justify-content:
+        center;
 
-      color: white;
+      text-align:
+        center;
+
+      padding:
+        100px 20px 80px;
+
+      color:
+        white;
 
       background:
-        radial-gradient(
-          circle at top left,
-          #3b3b3b,
-          #111 55%
-        );
+        var(--hero);
 
-      position: relative;
+      position:
+        relative;
 
-      overflow: hidden;
+      overflow:
+        hidden;
+
     }
+
 
     header::after {
+
       content: "";
 
-      position: absolute;
+      position:
+        absolute;
 
-      width: 500px;
-      height: 500px;
+      width:
+        520px;
 
-      border-radius: 50%;
+      height:
+        520px;
 
-      background: rgba(255,255,255,0.04);
+      border-radius:
+        50%;
 
-      right: -180px;
-      bottom: -220px;
+      background:
+        rgba(255,255,255,0.06);
+
+      right:
+        -180px;
+
+      bottom:
+        -230px;
+
     }
+
 
     .hero {
-      max-width: 850px;
 
-      position: relative;
-      z-index: 2;
+      max-width:
+        850px;
+
+      position:
+        relative;
+
+      z-index:
+        2;
+
     }
+
 
     .hero-label {
-      display: inline-block;
 
-      margin-bottom: 22px;
+      display:
+        inline-block;
 
-      padding: 7px 15px;
+      margin-bottom:
+        22px;
 
-      border-radius: 999px;
+      padding:
+        7px 16px;
 
-      background: rgba(255,255,255,0.1);
+      border-radius:
+        999px;
 
-      border: 1px solid rgba(255,255,255,0.15);
+      background:
+        rgba(255,255,255,0.1);
 
-      font-size: 13px;
+      border:
+        1px solid
+        rgba(255,255,255,0.18);
 
-      text-transform: uppercase;
+      font-size:
+        13px;
 
-      letter-spacing: 2px;
+      text-transform:
+        uppercase;
 
-      opacity: 0.9;
+      letter-spacing:
+        2px;
+
     }
+
 
     .hero h1 {
-      margin: 0;
 
-      font-size: clamp(
-        45px,
-        9vw,
-        88px
-      );
+      margin:
+        0;
 
-      line-height: 0.98;
+      font-size:
+        clamp(45px, 9vw, 88px);
 
-      letter-spacing: -4px;
+      line-height:
+        0.98;
 
-      font-weight: 800;
+      letter-spacing:
+        -4px;
+
+      font-weight:
+        800;
+
     }
+
 
     .hero-location {
-      margin: 25px 0 0;
 
-      font-size: 20px;
+      margin:
+        25px 0 0;
 
-      color: rgba(255,255,255,0.75);
+      font-size:
+        20px;
+
+      opacity:
+        0.75;
+
     }
+
 
     .hero-button {
-      display: inline-flex;
 
-      align-items: center;
-      justify-content: center;
+      display:
+        inline-flex;
 
-      margin-top: 38px;
+      align-items:
+        center;
 
-      padding: 15px 25px;
+      justify-content:
+        center;
 
-      border-radius: 999px;
+      margin-top:
+        38px;
 
-      background: white;
+      padding:
+        15px 27px;
 
-      color: #111;
+      border-radius:
+        999px;
 
-      text-decoration: none;
+      background:
+        white;
 
-      font-weight: 700;
+      color:
+        #111;
+
+      text-decoration:
+        none;
+
+      font-weight:
+        700;
 
       transition:
-        transform 0.2s,
-        box-shadow 0.2s;
+        0.2s;
+
     }
 
+
     .hero-button:hover {
-      transform: translateY(-3px);
+
+      transform:
+        translateY(-3px);
 
       box-shadow:
         0 10px 30px
         rgba(0,0,0,0.25);
+
     }
 
-    /* =========================
-       CONTENU
-    ========================= */
+
+    /* =====================================================
+       MAIN
+    ===================================================== */
 
     main {
-      max-width: 1100px;
 
-      margin: 0 auto;
+      max-width:
+        1100px;
 
-      padding: 90px 20px;
+      margin:
+        0 auto;
+
+      padding:
+        90px 20px;
+
     }
 
-    section {
-      margin-bottom: 90px;
+
+    .section {
+
+      margin-bottom:
+        90px;
+
     }
 
-    .section-header {
-      margin-bottom: 35px;
+
+    .section-heading {
+
+      margin-bottom:
+        35px;
+
     }
 
-    .section-label {
-      display: block;
 
-      margin-bottom: 8px;
+    .section-heading span {
 
-      font-size: 13px;
+      display:
+        block;
 
-      text-transform: uppercase;
+      margin-bottom:
+        8px;
 
-      letter-spacing: 2px;
+      font-size:
+        13px;
 
-      color: #777;
+      text-transform:
+        uppercase;
 
-      font-weight: 700;
+      letter-spacing:
+        2px;
+
+      color:
+        var(--muted);
+
+      font-weight:
+        700;
+
     }
 
-    .section-header h2 {
-      margin: 0;
 
-      font-size: 38px;
+    .section-heading h2 {
 
-      line-height: 1.1;
+      margin:
+        0;
 
-      letter-spacing: -1.5px;
+      font-size:
+        38px;
+
+      line-height:
+        1.1;
+
+      letter-spacing:
+        -1.5px;
+
     }
 
-    .section-header p {
-      margin: 12px 0 0;
 
-      color: #777;
+    .section-heading p {
 
-      font-size: 17px;
+      margin:
+        12px 0 0;
+
+      color:
+        var(--muted);
+
+      font-size:
+        17px;
+
     }
 
-    /* =========================
+
+    /* =====================================================
        SERVICES
-    ========================= */
+    ===================================================== */
 
     .services {
-      display: grid;
+
+      display:
+        grid;
 
       grid-template-columns:
         repeat(
@@ -374,283 +777,517 @@ function generateSiteHTML(site) {
           minmax(260px, 1fr)
         );
 
-      gap: 20px;
+      gap:
+        20px;
+
     }
 
+
     .service-card {
-      background: white;
 
-      border: 1px solid #e8e8e8;
+      background:
+        var(--surface);
 
-      border-radius: 20px;
+      border:
+        1px solid
+        var(--border);
 
-      padding: 28px;
+      border-radius:
+        var(--radius);
 
-      min-height: 130px;
+      padding:
+        28px;
 
-      display: flex;
+      min-height:
+        125px;
 
-      align-items: center;
+      display:
+        flex;
+
+      align-items:
+        center;
 
       transition:
         transform 0.2s,
         box-shadow 0.2s;
+
     }
 
+
     .service-card:hover {
-      transform: translateY(-5px);
+
+      transform:
+        translateY(-5px);
 
       box-shadow:
         0 15px 40px
         rgba(0,0,0,0.08);
+
     }
 
-    .service-content {
-      width: 100%;
 
-      display: flex;
+    .service-info {
 
-      align-items: center;
+      width:
+        100%;
 
-      justify-content: space-between;
+      display:
+        flex;
 
-      gap: 20px;
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      gap:
+        20px;
+
     }
+
 
     .service-card h3 {
-      margin: 0;
 
-      font-size: 19px;
+      margin:
+        0;
 
-      font-weight: 700;
+      font-size:
+        19px;
+
     }
+
 
     .service-price {
-      white-space: nowrap;
 
-      font-weight: 700;
+      white-space:
+        nowrap;
 
-      font-size: 18px;
+      font-weight:
+        700;
+
+      color:
+        var(--primary);
+
+      font-size:
+        18px;
+
     }
 
-    /* =========================
+
+    /* =====================================================
        ABOUT
-    ========================= */
+    ===================================================== */
 
     .about {
-      background: white;
 
-      border: 1px solid #e8e8e8;
+      background:
+        var(--surface);
 
-      border-radius: 24px;
+      border:
+        1px solid
+        var(--border);
 
-      padding: 45px;
+      border-radius:
+        var(--radius);
 
-      font-size: 18px;
+      padding:
+        45px;
 
-      color: #555;
+      color:
+        var(--muted);
+
+      font-size:
+        18px;
+
     }
+
 
     .about strong {
-      color: #111;
+
+      color:
+        var(--text);
+
     }
 
-    /* =========================
+
+    /* =====================================================
+       GALERIE
+    ===================================================== */
+
+    .gallery {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        repeat(
+          auto-fit,
+          minmax(250px, 1fr)
+        );
+
+      gap:
+        18px;
+
+    }
+
+
+    .gallery-item {
+
+      overflow:
+        hidden;
+
+      border-radius:
+        var(--radius);
+
+      background:
+        var(--surface);
+
+      border:
+        1px solid
+        var(--border);
+
+      aspect-ratio:
+        4 / 3;
+
+    }
+
+
+    .gallery-item img {
+
+      width:
+        100%;
+
+      height:
+        100%;
+
+      object-fit:
+        cover;
+
+      display:
+        block;
+
+      transition:
+        transform 0.3s;
+
+    }
+
+
+    .gallery-item:hover img {
+
+      transform:
+        scale(1.04);
+
+    }
+
+
+    /* =====================================================
        CONTACT
-    ========================= */
+    ===================================================== */
 
     .contact {
-      position: relative;
 
-      overflow: hidden;
+      background:
+        var(--primary);
 
-      background: #111;
+      color:
+        var(--primary-text);
 
-      color: white;
+      border-radius:
+        calc(var(--radius) + 8px);
 
-      border-radius: 28px;
+      padding:
+        65px 35px;
 
-      padding: 65px 35px;
+      text-align:
+        center;
 
-      text-align: center;
     }
 
-    .contact::before {
-      content: "";
-
-      position: absolute;
-
-      width: 300px;
-      height: 300px;
-
-      border-radius: 50%;
-
-      background: rgba(255,255,255,0.05);
-
-      top: -150px;
-      right: -100px;
-    }
-
-    .contact-content {
-      position: relative;
-      z-index: 2;
-    }
 
     .contact h2 {
-      margin: 0;
 
-      font-size: 40px;
+      margin:
+        0;
 
-      letter-spacing: -1px;
+      font-size:
+        40px;
+
     }
+
 
     .contact-subtitle {
-      margin: 12px 0 30px;
 
-      color: rgba(255,255,255,0.65);
+      margin:
+        12px 0 30px;
 
-      font-size: 17px;
+      opacity:
+        0.65;
+
+      font-size:
+        17px;
+
     }
+
 
     .contact-buttons {
-      display: flex;
 
-      flex-wrap: wrap;
+      display:
+        flex;
 
-      justify-content: center;
+      flex-wrap:
+        wrap;
 
-      gap: 10px;
+      justify-content:
+        center;
+
+      gap:
+        10px;
+
     }
+
 
     .contact-button {
-      display: inline-flex;
 
-      align-items: center;
-      justify-content: center;
+      display:
+        inline-flex;
 
-      padding: 14px 22px;
+      align-items:
+        center;
 
-      border-radius: 999px;
+      justify-content:
+        center;
 
-      background: white;
+      padding:
+        14px 22px;
 
-      color: #111;
+      border-radius:
+        999px;
 
-      text-decoration: none;
+      background:
+        white;
 
-      font-weight: 700;
+      color:
+        #111;
 
-      transition: 0.2s;
+      text-decoration:
+        none;
+
+      font-weight:
+        700;
+
+      transition:
+        0.2s;
+
     }
 
+
     .contact-button:hover {
-      transform: translateY(-3px);
+
+      transform:
+        translateY(-3px);
 
       box-shadow:
         0 10px 25px
         rgba(0,0,0,0.3);
+
     }
+
+
+    .contact-button.secondary {
+
+      background:
+        transparent;
+
+      color:
+        white;
+
+      border:
+        1px solid
+        rgba(255,255,255,0.35);
+
+    }
+
 
     .contact-address {
-      margin-top: 28px;
 
-      color: rgba(255,255,255,0.55);
+      margin-top:
+        28px;
 
-      font-size: 15px;
+      opacity:
+        0.6;
+
+      font-size:
+        15px;
+
     }
 
-    /* =========================
+
+    /* =====================================================
        FOOTER
-    ========================= */
+    ===================================================== */
 
     footer {
-      text-align: center;
 
-      padding: 35px 20px;
+      text-align:
+        center;
 
-      color: #888;
+      padding:
+        35px 20px;
 
-      font-size: 14px;
+      color:
+        var(--muted);
+
+      font-size:
+        14px;
+
     }
+
 
     footer strong {
-      color: #555;
+
+      color:
+        var(--text);
+
     }
 
-    /* =========================
+
+    /* =====================================================
        MOBILE
-    ========================= */
+    ===================================================== */
 
     @media (max-width: 700px) {
 
       nav {
-        padding: 18px 18px;
+
+        padding:
+          18px;
+
       }
+
 
       .nav-button {
-        display: none;
+
+        display:
+          none;
+
       }
+
 
       header {
-        min-height: 75vh;
 
-        padding: 90px 20px 60px;
+        min-height:
+          75vh;
+
+        padding:
+          90px 20px 60px;
+
       }
+
 
       .hero h1 {
-        letter-spacing: -2px;
+
+        font-size:
+          clamp(42px, 14vw, 65px);
+
+        letter-spacing:
+          -2px;
+
       }
+
 
       .hero-location {
-        font-size: 17px;
+
+        font-size:
+          17px;
+
       }
+
 
       main {
-        padding: 60px 15px;
+
+        padding:
+          60px 15px;
+
       }
 
-      section {
-        margin-bottom: 65px;
+
+      .section {
+
+        margin-bottom:
+          65px;
+
       }
 
-      .section-header h2 {
-        font-size: 30px;
+
+      .section-heading h2 {
+
+        font-size:
+          30px;
+
       }
 
-      .service-content {
-        align-items: flex-start;
 
-        flex-direction: column;
+      .service-info {
 
-        gap: 12px;
+        align-items:
+          flex-start;
+
+        flex-direction:
+          column;
+
+        gap:
+          10px;
+
       }
+
 
       .about {
-        padding: 28px;
 
-        font-size: 16px;
+        padding:
+          28px;
+
+        font-size:
+          16px;
+
       }
+
 
       .contact {
-        padding: 45px 20px;
+
+        padding:
+          45px 20px;
+
       }
+
 
       .contact h2 {
-        font-size: 31px;
+
+        font-size:
+          31px;
+
       }
 
+
       .contact-button {
-        width: 100%;
+
+        width:
+          100%;
+
       }
+
     }
 
   </style>
 
 </head>
 
+
 <body>
 
-  <!-- NAVIGATION -->
+
+  <!-- ===================================================
+       NAVIGATION
+  ==================================================== -->
 
   <nav>
 
@@ -671,7 +1308,9 @@ function generateSiteHTML(site) {
   </nav>
 
 
-  <!-- HERO -->
+  <!-- ===================================================
+       HERO
+  ==================================================== -->
 
   <header>
 
@@ -701,17 +1340,23 @@ function generateSiteHTML(site) {
   </header>
 
 
-  <!-- CONTENU -->
+  <!-- ===================================================
+       CONTENU
+  ==================================================== -->
 
   <main>
 
-    <!-- SERVICES -->
 
-    <section id="prestations">
+    <!-- PRESTATIONS -->
 
-      <div class="section-header">
+    <section
+      id="prestations"
+      class="section"
+    >
 
-        <span class="section-label">
+      <div class="section-heading">
+
+        <span>
           Nos services
         </span>
 
@@ -725,6 +1370,7 @@ function generateSiteHTML(site) {
 
       </div>
 
+
       <div class="services">
 
         ${servicesHTML}
@@ -736,11 +1382,11 @@ function generateSiteHTML(site) {
 
     <!-- À PROPOS -->
 
-    <section>
+    <section class="section">
 
-      <div class="section-header">
+      <div class="section-heading">
 
-        <span class="section-label">
+        <span>
           À propos
         </span>
 
@@ -750,13 +1396,16 @@ function generateSiteHTML(site) {
 
       </div>
 
+
       <div class="about">
 
         <p>
+
           Nous vous accueillons à
           <strong>${city}</strong>
-          et nous mettons notre savoir-faire
-          à votre service.
+          et nous mettons notre
+          savoir-faire à votre service.
+
         </p>
 
       </div>
@@ -764,73 +1413,93 @@ function generateSiteHTML(site) {
     </section>
 
 
+    <!-- GALERIE -->
+
+    ${galleryHTML}
+
+
     <!-- CONTACT -->
 
-    <section id="contact">
+    <section
+      id="contact"
+      class="section"
+    >
 
       <div class="contact">
 
-        <div class="contact-content">
+        <h2>
+          Parlons de votre projet
+        </h2>
 
-          <h2>
-            Parlons de votre projet
-          </h2>
+        <p class="contact-subtitle">
+          Une question ? Contactez-nous directement.
+        </p>
 
-          <p class="contact-subtitle">
-            Une question ? Contactez-nous directement.
-          </p>
 
-          <div class="contact-buttons">
+        <div class="contact-buttons">
 
-            ${
-              site.phone
-                ? `
-                  <a
-                    class="contact-button"
-                    href="tel:${phone}"
-                  >
-                    📞 Appeler
-                  </a>
-                `
-                : ""
-            }
 
-            ${
-              site.email
-                ? `
-                  <a
-                    class="contact-button"
-                    href="mailto:${email}"
-                  >
-                    ✉️ Envoyer un email
-                  </a>
-                `
-                : ""
-            }
+          ${
+            site.phone
+              ? `
+                <a
+                  class="contact-button"
+                  href="tel:${phone}"
+                >
+                  📞 Appeler
+                </a>
+              `
+              : ""
+          }
 
-          </div>
 
-          <p class="contact-address">
-            📍 ${address}
-          </p>
+          ${
+            site.email
+              ? `
+                <a
+                  class="contact-button"
+                  href="mailto:${email}"
+                >
+                  ✉️ Envoyer un email
+                </a>
+              `
+              : ""
+          }
+
+
+          ${socialHTML}
+
 
         </div>
+
+
+        <p class="contact-address">
+
+          📍 ${address}
+
+        </p>
 
       </div>
 
     </section>
 
+
   </main>
 
 
-  <!-- FOOTER -->
+  <!-- ===================================================
+       FOOTER
+  ==================================================== -->
 
   <footer>
 
     Créé avec
-    <strong>SiteFacile</strong>
+    <strong>
+      SiteFacile
+    </strong>
 
   </footer>
+
 
 </body>
 
@@ -838,35 +1507,44 @@ function generateSiteHTML(site) {
 }
 
 
+/* =========================================================
+   WORKER
+========================================================= */
+
 export default {
 
   async fetch(request, env) {
 
-    const url = new URL(request.url);
+    const url =
+      new URL(request.url);
 
 
-    // =========================
-    // CORS
-    // =========================
+    /* =====================================================
+       CORS
+    ===================================================== */
 
-    if (request.method === "OPTIONS") {
+    if (
+      request.method === "OPTIONS"
+    ) {
 
-      return new Response(null, {
-
-        status: 204,
-
-        headers: corsHeaders
-
-      });
+      return new Response(
+        null,
+        {
+          status: 204,
+          headers: corsHeaders
+        }
+      );
 
     }
 
 
-    // =========================
-    // TEST API
-    // =========================
+    /* =====================================================
+       TEST API
+    ===================================================== */
 
-    if (url.pathname === "/api/test") {
+    if (
+      url.pathname === "/api/test"
+    ) {
 
       return new Response(
         "API SiteFacile OK",
@@ -883,13 +1561,19 @@ export default {
     }
 
 
-    // =========================
-    // CRÉATION DU SITE
-    // =========================
+    /* =====================================================
+       CRÉATION DU SITE
+    ===================================================== */
 
-    if (url.pathname === "/api/create-site") {
+    if (
+      url.pathname ===
+      "/api/create-site"
+    ) {
 
-      if (request.method !== "POST") {
+
+      if (
+        request.method !== "POST"
+      ) {
 
         return jsonResponse(
           {
@@ -919,13 +1603,16 @@ export default {
 
 
         const services =
-          Array.isArray(data.services)
+          Array.isArray(
+            data.services
+          )
             ? data.services
             : [];
 
 
-        // Vérification
-        // des champs obligatoires
+        /* =================================================
+           VALIDATION
+        ================================================= */
 
         if (
           !businessName ||
@@ -947,11 +1634,11 @@ export default {
         }
 
 
-        // =========================
-        // IDENTIFIANT DU SITE
-        // =========================
+        /* =================================================
+           IDENTIFIANT
+        ================================================= */
 
-        const siteId =
+        const cleanName =
           businessName
 
             .toLowerCase()
@@ -971,25 +1658,32 @@ export default {
             .replace(
               /^-+|-+$/g,
               ""
-            )
+            );
 
-          + "-" +
+
+        const siteId =
+          cleanName +
+          "-" +
           Date.now();
 
 
-        // =========================
-        // DONNÉES DU SITE
-        // =========================
+        /* =================================================
+           DONNÉES
+        ================================================= */
 
         const siteData = {
 
-          id: siteId,
+          id:
+            siteId,
 
-          businessName,
+          businessName:
+            businessName,
 
-          city,
+          city:
+            city,
 
-          services,
+          services:
+            services,
 
           activity:
             data.activity || "",
@@ -1007,10 +1701,12 @@ export default {
             data.social || "",
 
           style:
-            data.style || "",
+            data.style || "Moderne",
 
           images:
-            data.images || [],
+            Array.isArray(data.images)
+              ? data.images
+              : [],
 
           createdAt:
             new Date().toISOString()
@@ -1018,9 +1714,9 @@ export default {
         };
 
 
-        // =========================
-        // ENREGISTREMENT JSON
-        // =========================
+        /* =================================================
+           R2 : JSON
+        ================================================= */
 
         await env.SITE_STORAGE.put(
 
@@ -1033,6 +1729,7 @@ export default {
           ),
 
           {
+
             httpMetadata: {
 
               contentType:
@@ -1045,9 +1742,9 @@ export default {
         );
 
 
-        // =========================
-        // GÉNÉRATION HTML
-        // =========================
+        /* =================================================
+           GÉNÉRATION HTML
+        ================================================= */
 
         const siteHTML =
           generateSiteHTML(
@@ -1055,9 +1752,9 @@ export default {
           );
 
 
-        // =========================
-        // ENREGISTREMENT HTML
-        // =========================
+        /* =================================================
+           R2 : HTML
+        ================================================= */
 
         await env.SITE_STORAGE.put(
 
@@ -1079,18 +1776,20 @@ export default {
         );
 
 
-        // =========================
-        // RÉPONSE
-        // =========================
+        /* =================================================
+           RÉPONSE
+        ================================================= */
 
         return jsonResponse({
 
-          success: true,
+          success:
+            true,
 
           message:
             "Site enregistré avec succès dans SiteFacile",
 
-          site: siteData,
+          site:
+            siteData,
 
           url:
             `/site/${siteId}`
@@ -1098,7 +1797,9 @@ export default {
         });
 
 
-      } catch (error) {
+      }
+
+      catch (error) {
 
         console.error(
           "Erreur création site :",
@@ -1110,7 +1811,8 @@ export default {
 
           {
 
-            success: false,
+            success:
+              false,
 
             error:
               error.message ||
@@ -1127,15 +1829,16 @@ export default {
     }
 
 
-    // =========================
-    // AFFICHAGE DU SITE
-    // =========================
+    /* =====================================================
+       AFFICHAGE DU SITE
+    ===================================================== */
 
     if (
       url.pathname.startsWith(
         "/site/"
       )
     ) {
+
 
       const sitePath =
         url.pathname
@@ -1159,7 +1862,8 @@ export default {
 
           {
 
-            status: 400,
+            status:
+              400,
 
             headers:
               corsHeaders
@@ -1187,7 +1891,8 @@ export default {
 
           {
 
-            status: 404,
+            status:
+              404,
 
             headers:
               corsHeaders
@@ -1221,11 +1926,13 @@ export default {
     }
 
 
-    // =========================
-    // AUTRES FICHIERS
-    // =========================
+    /* =====================================================
+       AUTRES REQUÊTES
+    ===================================================== */
 
-    return env.ASSETS.fetch(request);
+    return env.ASSETS.fetch(
+      request
+    );
 
   }
 
