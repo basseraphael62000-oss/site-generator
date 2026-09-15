@@ -260,7 +260,25 @@ await env.SITE_STORAGE.put(
         );
       }
     }
+// Affichage d'un site généré depuis R2
+if (url.pathname.startsWith("/site/")) {
+  const sitePath = url.pathname.replace("/site/", "");
+  const object = await env.SITE_STORAGE.get(
+    `sites/${sitePath}/index.html`
+  );
 
+  if (!object) {
+    return new Response("Site introuvable", {
+      status: 404
+    });
+  }
+
+  return new Response(object.body, {
+    headers: {
+      "Content-Type": "text/html; charset=utf-8"
+    }
+  });
+}
     // Les autres requêtes continuent vers les fichiers du site
     return env.ASSETS.fetch(request);
   }
