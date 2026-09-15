@@ -984,3 +984,52 @@ RESPONSIVE
     }
 
 }
+/* =========================================
+   OFFRE SITEFACILE
+========================================= */
+
+.order-summary {
+    margin: 30px 0;
+    padding: 30px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.order-summary h4 {
+    margin: 0 0 20px;
+    font-size: 24px;
+}
+
+.order-summary ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 25px;
+    max-width: 360px;
+    text-align: left;
+}
+
+.order-summary li {
+    padding: 7px 0;
+    color: #555;
+}
+
+.order-price {
+    font-size: 38px;
+    font-weight: 800;
+    margin-top: 15px;
+}
+
+@media (max-width: 600px) {
+
+    .order-summary {
+        padding: 25px 18px;
+    }
+
+    .order-price {
+        font-size: 32px;
+    }
+
+}
