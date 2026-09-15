@@ -1,12 +1,37 @@
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "https://basseraphael62000-oss.github.io",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type"
+};
+
+function jsonResponse(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      ...corsHeaders
+    }
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    // Autoriser les requêtes CORS du site GitHub Pages
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders
+      });
+    }
 
     // Test de l'API
     if (url.pathname === "/api/test") {
       return new Response("API SiteFacile OK", {
         headers: {
-          "Content-Type": "text/plain; charset=utf-8"
+          "Content-Type": "text/plain; charset=utf-8",
+          ...corsHeaders
         }
       });
     }
@@ -14,76 +39,63 @@ export default {
     // Création de site - étape de test
     if (url.pathname === "/api/create-site") {
       if (request.method !== "POST") {
-        return new Response(
-          JSON.stringify({
+        return jsonResponse(
+          {
             success: false,
             error: "Méthode POST requise"
-          }),
-          {
-            status: 405,
-            headers: {
-              "Content-Type": "application/json"
-            }
-          }
+          },
+          405
         );
       }
 
       try {
         const data = await request.json();
 
-        const name = data.name?.trim();
+        const businessName = data.businessName?.trim();
         const city = data.city?.trim();
-        const service = data.service?.trim();
+        const services = Array.isArray(data.services)
+          ? data.services
+          : [];
 
-        if (!name || !city || !service) {
-          return new Response(
-            JSON.stringify({
-              success: false,
-              error: "Nom, ville et prestation sont obligatoires"
-            }),
+        if (!businessName || !city || services.length === 0) {
+          return jsonResponse(
             {
-              status: 400,
-              headers: {
-                "Content-Type": "application/json"
-              }
-            }
+              success: false,
+              error:
+                "Le nom de l'entreprise, la ville et au moins une prestation sont obligatoires."
+            },
+            400
           );
         }
 
-        return new Response(
-          JSON.stringify({
-            success: true,
-            message: "Données reçues par SiteFacile",
-            site: {
-              name,
-              city,
-              service
-            }
-          }),
-          {
-            status: 200,
-            headers: {
-              "Content-Type": "application/json"
-            }
+        return jsonResponse({
+          success: true,
+          message: "Données reçues par SiteFacile",
+          site: {
+            businessName,
+            city,
+            services,
+            activity: data.activity || "",
+            address: data.address || "",
+            phone: data.phone || "",
+            email: data.email || "",
+            social: data.social || "",
+            style: data.style || "",
+            images: data.images || []
           }
-        );
+        });
       } catch (error) {
-        return new Response(
-          JSON.stringify({
+        return jsonResponse(
+          {
             success: false,
             error: "JSON invalide"
-          }),
-          {
-            status: 400,
-            headers: {
-              "Content-Type": "application/json"
-            }
-          }
+          },
+          400
         );
       }
     }
 
-    // Toutes les autres requêtes continuent vers les fichiers du site
+    // Les autres requêtes continuent vers les fichiers du site
     return env.ASSETS.fetch(request);
   }
 };
