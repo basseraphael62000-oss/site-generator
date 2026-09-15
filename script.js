@@ -389,7 +389,7 @@ PHOTOS
 ========================================= */
 
 function previewImages(event) {
-    const files = event.target.files;
+    const files = Array.from(event.target.files || []);
 
     const preview =
         document.getElementById("imagePreview");
@@ -399,19 +399,30 @@ function previewImages(event) {
     }
 
     preview.innerHTML = "";
-
     project.images = [];
 
-    Array.from(files).forEach(file => {
+    if (files.length === 0) {
+        saveProject();
+        return;
+    }
+
+    files.forEach((file) => {
+
+        if (!file.type.startsWith("image/")) {
+            return;
+        }
+
         const reader = new FileReader();
 
         reader.onload = function(e) {
-            project.images.push(e.target.result);
+
+            const imageData = e.target.result;
+
+            project.images.push(imageData);
 
             const img = document.createElement("img");
 
-            img.src = e.target.result;
-
+            img.src = imageData;
             img.alt = "Photo de l'entreprise";
 
             preview.appendChild(img);
