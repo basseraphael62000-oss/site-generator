@@ -251,13 +251,13 @@ await env.SITE_STORAGE.put(
       } catch (error) {
         console.error("Erreur création site :", error);
 
-        return jsonResponse(
-          {
-            success: false,
-            error: "Impossible d'enregistrer le site."
-          },
-          500
-        );
+       return jsonResponse(
+  {
+    success: false,
+    error: error.message || "Impossible d'enregistrer le site."
+  },
+  500
+);
       }
     }
 // Affichage d'un site généré depuis R2
