@@ -13,9 +13,28 @@ function jsonResponse(data, status = 200) {
     }
   });
 }
+
+// Génération du site HTML
 function generateSiteHTML(site) {
   const servicesHTML = site.services
-    .map(service => `<li>${service}</li>`)
+    .map(service => {
+      const name =
+        typeof service === "object"
+          ? service.name || ""
+          : service;
+
+      const price =
+        typeof service === "object"
+          ? service.price || ""
+          : "";
+
+      return `
+        <li>
+          <strong>${name}</strong>
+          ${price ? ` — ${price} €` : ""}
+        </li>
+      `;
+    })
     .join("");
 
   return `<!DOCTYPE html>
@@ -23,6 +42,7 @@ function generateSiteHTML(site) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>${site.businessName} - ${site.city}</title>
 
   <style>
@@ -71,7 +91,7 @@ function generateSiteHTML(site) {
     }
 
     li {
-      margin: 10px 0;
+      margin: 15px 0;
     }
 
     .contact {
@@ -100,7 +120,11 @@ function generateSiteHTML(site) {
 
   <header>
     <h1>${site.businessName}</h1>
-    <p>${site.activity || "Bienvenue sur notre site"} · ${site.city}</p>
+
+    <p>
+      ${site.activity || "Bienvenue sur notre site"}
+      · ${site.city}
+    </p>
   </header>
 
   <section>
@@ -113,6 +137,7 @@ function generateSiteHTML(site) {
 
   <section>
     <h2>À propos</h2>
+
     <p>
       Bienvenue chez ${site.businessName}.
       Retrouvez-nous à ${site.city}.
@@ -120,17 +145,29 @@ function generateSiteHTML(site) {
   </section>
 
   <section class="contact">
+
     <h2>Contact</h2>
 
-    ${site.phone
-      ? `<a href="tel:${site.phone}">📞 ${site.phone}</a>`
-      : ""}
+    ${
+      site.phone
+        ? `<a href="tel:${site.phone}">
+             📞 ${site.phone}
+           </a>`
+        : ""
+    }
 
-    ${site.email
-      ? `<a href="mailto:${site.email}">✉️ ${site.email}</a>`
-      : ""}
+    ${
+      site.email
+        ? `<a href="mailto:${site.email}">
+             ✉️ ${site.email}
+           </a>`
+        : ""
+    }
 
-    <p>${site.address || site.city}</p>
+    <p>
+      ${site.address || site.city}
+    </p>
+
   </section>
 
   <footer>
@@ -140,11 +177,12 @@ function generateSiteHTML(site) {
 </body>
 </html>`;
 }
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Autoriser les requêtes CORS du site GitHub Pages
+    // CORS
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
@@ -162,8 +200,9 @@ export default {
       });
     }
 
-    // Création de site
+    // Création du site
     if (url.pathname === "/api/create-site") {
+
       if (request.method !== "POST") {
         return jsonResponse(
           {
@@ -179,10 +218,12 @@ export default {
 
         const businessName = data.businessName?.trim();
         const city = data.city?.trim();
+
         const services = Array.isArray(data.services)
           ? data.services
           : [];
 
+        // Vérification des champs obligatoires
         if (!businessName || !city || services.length === 0) {
           return jsonResponse(
             {
@@ -194,7 +235,7 @@ export default {
           );
         }
 
-        // Création d'un identifiant simple pour le site
+        // Création de l'identifiant
         const siteId =
           businessName
             .toLowerCase()
@@ -205,7 +246,7 @@ export default {
           "-" +
           Date.now();
 
-        // Données du site à sauvegarder
+        // Données du site
         const siteData = {
           id: siteId,
           businessName,
@@ -221,7 +262,7 @@ export default {
           createdAt: new Date().toISOString()
         };
 
-        // Enregistrement dans R2
+        // Enregistrement JSON dans R2
         await env.SITE_STORAGE.put(
           `sites/${siteId}.json`,
           JSON.stringify(siteData, null, 2),
@@ -231,54 +272,93 @@ export default {
             }
           }
         );
-// Génération du vrai site HTML
-const siteHTML = generateSiteHTML(siteData);
 
-await env.SITE_STORAGE.put(
-  `sites/${siteId}/index.html`,
-  siteHTML,
-  {
-    httpMetadata: {
-      contentType: "text/html; charset=utf-8"
-    }
-  }
-);
+        // Génération du site HTML
+        const siteHTML = generateSiteHTML(siteData);
+
+        // Enregistrement du HTML dans R2
+        await env.SITE_STORAGE.put(
+          `sites/${siteId}/index.html`,
+          siteHTML,
+          {
+            httpMetadata: {
+              contentType: "text/html; charset=utf-8"
+            }
+          }
+        );
+
+        // Réponse
         return jsonResponse({
           success: true,
           message: "Site enregistré avec succès dans SiteFacile",
-          site: siteData
+          site: siteData,
+          url: `/site/${siteId}`
         });
-      } catch (error) {
-        console.error("Erreur création site :", error);
 
-       return jsonResponse(
-  {
-    success: false,
-    error: error.message || "Impossible d'enregistrer le site."
-  },
-  500
-);
+      } catch (error) {
+
+        console.error(
+          "Erreur création site :",
+          error
+        );
+
+        return jsonResponse(
+          {
+            success: false,
+            error:
+              error.message ||
+              "Impossible d'enregistrer le site."
+          },
+          500
+        );
       }
     }
-// Affichage d'un site généré depuis R2
-if (url.pathname.startsWith("/site/")) {
-  const sitePath = url.pathname.replace("/site/", "");
-  const object = await env.SITE_STORAGE.get(
-    `sites/${sitePath}/index.html`
-  );
 
-  if (!object) {
-    return new Response("Site introuvable", {
-      status: 404
-    });
-  }
+    // Affichage d'un site généré depuis R2
+    if (url.pathname.startsWith("/site/")) {
 
-  return new Response(object.body, {
-    headers: {
-      "Content-Type": "text/html; charset=utf-8"
+      const sitePath =
+        url.pathname
+          .replace("/site/", "")
+          .replace(/\/$/, "");
+
+      if (!sitePath) {
+        return new Response(
+          "Identifiant du site manquant",
+          {
+            status: 400,
+            headers: corsHeaders
+          }
+        );
+      }
+
+      const object =
+        await env.SITE_STORAGE.get(
+          `sites/${sitePath}/index.html`
+        );
+
+      if (!object) {
+        return new Response(
+          "Site introuvable",
+          {
+            status: 404,
+            headers: corsHeaders
+          }
+        );
+      }
+
+      return new Response(
+        object.body,
+        {
+          headers: {
+            "Content-Type":
+              "text/html; charset=utf-8",
+            ...corsHeaders
+          }
+        }
+      );
     }
-  });
-}
+
     // Les autres requêtes continuent vers les fichiers du site
     return env.ASSETS.fetch(request);
   }
