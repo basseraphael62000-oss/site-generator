@@ -554,7 +554,9 @@ PUBLICATION
 
 async function publishSite() {
     try {
-        const response = await fetch("/api/create-site", {
+       const response = await fetch(
+    "https://site-generator.basse-raphael62000.workers.dev/api/create-site",
+    {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
