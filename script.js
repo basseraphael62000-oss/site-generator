@@ -573,9 +573,11 @@ async function publishSite() {
         }
 
         alert(
-            "🎉 Votre site est prêt !\n\n" +
-            "Les informations ont bien été envoyées à SiteFacile."
-        );
+    "🎉 Votre site est prêt !\n\n" +
+    "Votre site :\n" +
+    "https://site-generator.basse-raphael62000.workers.dev" +
+    data.url
+);
 
         console.log("Site publié :", data);
 
