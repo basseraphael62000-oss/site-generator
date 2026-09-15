@@ -552,11 +552,39 @@ function generateWebsitePreview() {
 PUBLICATION
 ========================================= */
 
-function publishSite() {
-    alert(
-        "🎉 Votre site est prêt !\n\n" +
-        "La publication en ligne sera disponible prochainement."
-    );
+async function publishSite() {
+    try {
+        const response = await fetch("/api/create-site", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(project)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.error || "Erreur lors de la publication."
+            );
+        }
+
+        alert(
+            "🎉 Votre site est prêt !\n\n" +
+            "Les informations ont bien été envoyées à SiteFacile."
+        );
+
+        console.log("Site publié :", data);
+
+    } catch (error) {
+        console.error("Erreur de publication :", error);
+
+        alert(
+            "❌ Impossible de publier le site pour le moment.\n\n" +
+            error.message
+        );
+    }
 }
 
 /* =========================================
