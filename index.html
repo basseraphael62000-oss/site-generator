@@ -452,50 +452,57 @@
 
         <!-- STEP 5 -->
 
-        <div class="builder-step" id="step5">
+       <div class="builder-step" id="step5">
 
-            <h3>Ajoutez vos photos</h3>
+    <h3>Ajoutez vos photos</h3>
 
-            <p class="step-description">
-                Ajoutez quelques images pour personnaliser votre site.
-            </p>
+    <p class="step-description">
+        Ajoutez quelques images pour personnaliser votre site.
+    </p>
 
+    <div class="upload-box">
 
-            <div class="upload-box">
+        <div class="upload-icon">📸</div>
 
-                <div class="upload-icon">📸</div>
+        <p>
+            Sélectionnez vos photos
+        </p>
 
-                <p>
-                    Sélectionnez vos photos
-                </p>
+        <span class="upload-hint">
+            Vous pouvez sélectionner plusieurs photos
+        </span>
 
-                <input
-                    type="file"
-                    id="images"
-                    accept="image/*"
-                    multiple
-                    onchange="previewImages(event)"
-                >
+        <input
+            type="file"
+            id="images"
+            accept="image/*"
+            multiple
+            onchange="previewImages(event)"
+        >
 
-            </div>
+    </div>
 
+    <div id="imagePreview"></div>
 
-            <div id="imagePreview"></div>
+    <div class="builder-buttons">
 
+        <button
+            class="back-button"
+            onclick="previousStep()"
+        >
+            ← Retour
+        </button>
 
-            <div class="builder-buttons">
+        <button
+            class="next-button"
+            onclick="nextStep()"
+        >
+            Voir mon site →
+        </button>
 
-                <button class="back-button" onclick="previousStep()">
-                    ← Retour
-                </button>
+    </div>
 
-                <button class="next-button" onclick="nextStep()">
-                    Voir mon site →
-                </button>
-
-            </div>
-
-        </div>
+</div>
 
 
         <!-- STEP 6 -->
