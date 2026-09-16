@@ -590,121 +590,304 @@ GÉNÉRER LE SITE
 ========================================= */
 
 function generateWebsitePreview() {
+
     saveCurrentStep();
 
     const container =
         document.getElementById("generatedSite");
 
     if (!container) {
-        console.error("L'élément #generatedSite est introuvable.");
+        console.error(
+            "L'élément #generatedSite est introuvable."
+        );
         return;
     }
 
+    const style =
+        String(project.style || "Moderne")
+            .toLowerCase()
+            .trim();
+
+    let theme = {
+        background: "#f5f5f5",
+        surface: "#ffffff",
+        text: "#151515",
+        muted: "#777777",
+        primary: "#111111",
+        hero: "linear-gradient(135deg, #111111, #303030)"
+    };
+
+
+    if (style === "élégant") {
+
+        theme = {
+            background: "#f5f1eb",
+            surface: "#fffdf9",
+            text: "#2a2520",
+            muted: "#766e65",
+            primary: "#6d5140",
+            hero: "linear-gradient(135deg, #2c211b, #735641)"
+        };
+
+    }
+
+
+    else if (style === "minimaliste") {
+
+        theme = {
+            background: "#ffffff",
+            surface: "#ffffff",
+            text: "#222222",
+            muted: "#888888",
+            primary: "#222222",
+            hero: "linear-gradient(135deg, #eeeeee, #dcdcdc)"
+        };
+
+    }
+
+
+    else if (style === "coloré") {
+
+        theme = {
+            background: "#f5f3ff",
+            surface: "#ffffff",
+            text: "#222222",
+            muted: "#68627a",
+            primary: "#6c4cff",
+            hero: "linear-gradient(135deg, #6c4cff, #d84cff)"
+        };
+
+    }
+
+
+    /* SERVICES */
+
     const servicesHTML =
         project.services.length > 0
+
             ? project.services
                 .map(service => `
-                    <div class="generated-service">
+                    <div
+                        class="generated-service"
+                        style="
+                            background:${theme.surface};
+                            border-color:#e8e8e8;
+                        "
+                    >
+
                         <span>
-                            ${escapeHTML(service.name)}
+                            ${escapeHTML(
+                                service.name || ""
+                            )}
                         </span>
 
-                        <strong>
-                            ${
-                                service.price
-                                    ? escapeHTML(service.price)
-                                    : ""
-                            }
-                        </strong>
+                        ${
+                            service.price
+                                ? `
+                                    <strong>
+                                        ${escapeHTML(
+                                            service.price
+                                        )} €
+                                    </strong>
+                                `
+                                : ""
+                        }
+
                     </div>
                 `)
                 .join("")
+
             : `
-                <p>
-                    Ajoutez vos prestations pour les afficher ici.
+                <p style="color:${theme.muted};">
+                    Ajoutez vos prestations
+                    pour les afficher ici.
                 </p>
             `;
 
+
+    /* PHOTOS */
+
     const imagesHTML =
         project.images.length > 0
+
             ? `
-                <div class="generated-images">
-                    ${project.images
-                        .map(image => `
-                            <img
-                                src="${image}"
-                                alt="Photo de l'entreprise"
-                            >
-                        `)
-                        .join("")}
-                </div>
+                <section class="generated-gallery-section">
+
+                    <span
+                        class="generated-label"
+                        style="
+                            color:${theme.muted};
+                        "
+                    >
+                        GALERIE
+                    </span>
+
+                    <h3>
+                        Découvrez notre univers
+                    </h3>
+
+                    <div class="generated-images">
+
+                        ${project.images
+                            .map(image => `
+                                <div
+                                    class="generated-image-item"
+                                >
+
+                                    <img
+                                        src="${image}"
+                                        alt="Photo de ${escapeHTML(
+                                            project.businessName ||
+                                            "l'entreprise"
+                                        )}"
+                                    >
+
+                                </div>
+                            `)
+                            .join("")}
+
+                    </div>
+
+                </section>
             `
+
             : "";
 
+
+    /* CONTACT */
+
+    const contactItems = [];
+
+    if (project.address) {
+        contactItems.push(
+            `<p>📍 ${escapeHTML(project.address)}</p>`
+        );
+    }
+
+    if (project.phone) {
+        contactItems.push(
+            `<p>📞 ${escapeHTML(project.phone)}</p>`
+        );
+    }
+
+    if (project.email) {
+        contactItems.push(
+            `<p>✉️ ${escapeHTML(project.email)}</p>`
+        );
+    }
+
+    if (project.social) {
+        contactItems.push(
+            `<p>📱 ${escapeHTML(project.social)}</p>`
+        );
+    }
+
+
     container.innerHTML = `
-        <div class="generated-site">
 
-            <div class="generated-hero">
+        <div
+            class="generated-site"
+            style="
+                background:${theme.background};
+                color:${theme.text};
+            "
+        >
 
-                <small>
-                    ${escapeHTML(project.activity)}
-                </small>
+            <!-- HERO -->
+
+            <header
+                class="generated-hero"
+                style="
+                    background:${theme.hero};
+                "
+            >
+
+                <span class="generated-activity">
+                    ${escapeHTML(
+                        project.activity ||
+                        "Entreprise"
+                    )}
+                </span>
 
                 <h2>
-                    ${escapeHTML(project.businessName)}
+                    ${escapeHTML(
+                        project.businessName ||
+                        "Votre entreprise"
+                    )}
                 </h2>
 
-                <p>
-                    ${escapeHTML(project.city)}
-                </p>
+                ${
+                    project.city
+                        ? `
+                            <p>
+                                📍
+                                ${escapeHTML(
+                                    project.city
+                                )}
+                            </p>
+                        `
+                        : ""
+                }
 
-            </div>
+            </header>
 
-            <div class="generated-content">
+
+            <!-- CONTENU -->
+
+            <main class="generated-content">
 
                 ${imagesHTML}
 
-                <h3>
-                    Nos prestations
-                </h3>
 
-                <div class="generated-services">
-                    ${servicesHTML}
-                </div>
+                <!-- SERVICES -->
 
-                <div class="generated-contact">
+                <section>
+
+                    <span
+                        class="generated-label"
+                        style="
+                            color:${theme.muted};
+                        "
+                    >
+                        NOS SERVICES
+                    </span>
 
                     <h3>
-                        Contact
+                        Des prestations
+                        adaptées à vos besoins
                     </h3>
 
-                    ${
-                        project.address
-                            ? `<p>📍 ${escapeHTML(project.address)}</p>`
-                            : ""
-                    }
+                    <div class="generated-services">
+                        ${servicesHTML}
+                    </div>
 
-                    ${
-                        project.phone
-                            ? `<p>📞 ${escapeHTML(project.phone)}</p>`
-                            : ""
-                    }
+                </section>
 
-                    ${
-                        project.email
-                            ? `<p>✉️ ${escapeHTML(project.email)}</p>`
-                            : ""
-                    }
 
-                    ${
-                        project.social
-                            ? `<p>📱 ${escapeHTML(project.social)}</p>`
-                            : ""
-                    }
+                <!-- CONTACT -->
 
-                </div>
+                ${
+                    contactItems.length > 0
+                        ? `
+                            <section
+                                class="generated-contact"
+                                style="
+                                    background:${theme.primary};
+                                "
+                            >
 
-            </div>
+                                <h3>
+                                    Contact
+                                </h3>
+
+                                ${contactItems.join("")}
+
+                            </section>
+                        `
+                        : ""
+                }
+
+            </main>
 
         </div>
     `;
