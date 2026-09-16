@@ -383,12 +383,77 @@ function removeService(button) {
 
     saveCurrentStep();
 }
+function compressImage(file) {
 
+    return new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+
+            const img = new Image();
+
+            img.onload = function() {
+
+                const maxWidth = 1600;
+                const maxHeight = 1600;
+
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth || height > maxHeight) {
+
+                    const ratio = Math.min(
+                        maxWidth / width,
+                        maxHeight / height
+                    );
+
+                    width = Math.round(width * ratio);
+                    height = Math.round(height * ratio);
+                }
+
+                const canvas =
+                    document.createElement("canvas");
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx =
+                    canvas.getContext("2d");
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                const compressedImage =
+                    canvas.toDataURL(
+                        "image/jpeg",
+                        0.82
+                    );
+
+                resolve(compressedImage);
+            };
+
+            img.onerror = reject;
+
+            img.src = event.target.result;
+        };
+
+        reader.onerror = reject;
+
+        reader.readAsDataURL(file);
+    });
+}
 /* =========================================
 PHOTOS
 ========================================= */
 
-function previewImages(event) {
+async function previewImages(event) {
+
     const files = Array.from(event.target.files || []);
 
     const preview =
@@ -406,32 +471,38 @@ function previewImages(event) {
         return;
     }
 
-    files.forEach((file) => {
+    const imageFiles = files.filter(file =>
+        file.type.startsWith("image/")
+    );
 
-        if (!file.type.startsWith("image/")) {
-            return;
-        }
+    for (const file of imageFiles) {
 
-        const reader = new FileReader();
+        try {
 
-        reader.onload = function(e) {
-
-            const imageData = e.target.result;
+            const imageData =
+                await compressImage(file);
 
             project.images.push(imageData);
 
-            const img = document.createElement("img");
+            const img =
+                document.createElement("img");
 
             img.src = imageData;
             img.alt = "Photo de l'entreprise";
 
             preview.appendChild(img);
 
-            saveProject();
-        };
+        } catch (error) {
 
-        reader.readAsDataURL(file);
-    });
+            console.error(
+                "Erreur lors du traitement de la photo :",
+                error
+            );
+
+        }
+    }
+
+    saveProject();
 }
 
 /* =========================================
