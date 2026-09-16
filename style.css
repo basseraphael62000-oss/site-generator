@@ -689,14 +689,25 @@ IMAGE PREVIEW
 @media (max-width: 600px) {
 
     #imagePreview {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
         margin-top: 20px;
+        padding: 0 2px;
     }
 
     .image-preview-item {
-        border-radius: 11px;
-        aspect-ratio: 4 / 3;
+        width: 100%;
+        height: 115px;
+        aspect-ratio: auto;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .image-preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
     }
 
 }
