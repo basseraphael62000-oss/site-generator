@@ -452,7 +452,7 @@ function compressImage(file) {
 PHOTOS
 ========================================= */
 
-async function previewImages(event) {
+function previewImages(event) {
 
     const files = Array.from(event.target.files || []);
 
@@ -475,34 +475,114 @@ async function previewImages(event) {
         file.type.startsWith("image/")
     );
 
-    for (const file of imageFiles) {
+    imageFiles.forEach((file, index) => {
 
-        try {
+        compressImage(file)
+            .then(imageData => {
 
-            const imageData =
-                await compressImage(file);
+                project.images[index] = imageData;
 
-            project.images.push(imageData);
+                const wrapper =
+                    document.createElement("div");
 
-            const img =
-                document.createElement("img");
+                wrapper.className =
+                    "image-preview-item";
 
-            img.src = imageData;
-            img.alt = "Photo de l'entreprise";
+                const img =
+                    document.createElement("img");
 
-            preview.appendChild(img);
+                img.src = imageData;
 
-        } catch (error) {
+                img.alt =
+                    "Photo de l'entreprise";
 
-            console.error(
-                "Erreur lors du traitement de la photo :",
-                error
-            );
+                wrapper.appendChild(img);
 
-        }
-    }
+                preview.appendChild(wrapper);
 
-    saveProject();
+                if (
+                    project.images.filter(Boolean).length ===
+                    imageFiles.length
+                ) {
+                    saveProject();
+                }
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "Erreur lors du traitement de la photo :",
+                    error
+                );
+
+            });
+
+    });
+}
+
+
+function compressImage(file) {
+
+    return new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+
+            const img = new Image();
+
+            img.onload = function() {
+
+                const maxWidth = 1600;
+                const maxHeight = 1600;
+
+                let width = img.width;
+                let height = img.height;
+
+                const ratio = Math.min(
+                    maxWidth / width,
+                    maxHeight / height,
+                    1
+                );
+
+                width = Math.round(width * ratio);
+                height = Math.round(height * ratio);
+
+                const canvas =
+                    document.createElement("canvas");
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx =
+                    canvas.getContext("2d");
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                const compressedImage =
+                    canvas.toDataURL(
+                        "image/jpeg",
+                        0.82
+                    );
+
+                resolve(compressedImage);
+            };
+
+            img.onerror = reject;
+
+            img.src = event.target.result;
+        };
+
+        reader.onerror = reject;
+
+        reader.readAsDataURL(file);
+    });
 }
 
 /* =========================================
