@@ -1,4 +1,301 @@
-return `<!DOCTYPE html>
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "https://basseraphael62000-oss.github.io",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type"
+};
+
+function jsonResponse(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      ...corsHeaders
+    }
+  });
+}
+
+/* =========================================================
+   SÉCURITÉ
+========================================================= */
+
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================================
+   GÉNÉRATION DU SITE
+========================================================= */
+
+function generateSiteHTML(site) {
+
+  const businessName = escapeHTML(site.businessName);
+  const city = escapeHTML(site.city);
+  const activity = escapeHTML(
+    site.activity || "Bienvenue"
+  );
+
+  const address = escapeHTML(
+    site.address || site.city
+  );
+
+  const phone = escapeHTML(site.phone);
+  const email = escapeHTML(site.email);
+  const social = escapeHTML(site.social);
+
+  /* =======================================================
+     STYLE
+  ======================================================= */
+
+  const selectedStyle =
+    String(site.style || "Moderne")
+      .toLowerCase()
+      .trim();
+
+
+  let theme = {
+    background: "#f6f6f7",
+    surface: "#ffffff",
+    text: "#151515",
+    muted: "#777777",
+    primary: "#111111",
+    primaryText: "#ffffff",
+    border: "#e7e7e7",
+    hero: "linear-gradient(135deg, #111111, #2c2c2c)",
+    radius: "20px",
+    font: "Arial, Helvetica, sans-serif"
+  };
+
+
+  /* =======================================================
+     MODERNE
+  ======================================================= */
+
+  if (selectedStyle === "moderne") {
+
+    theme = {
+      background: "#f6f6f7",
+      surface: "#ffffff",
+      text: "#151515",
+      muted: "#777777",
+      primary: "#111111",
+      primaryText: "#ffffff",
+      border: "#e7e7e7",
+      hero: "linear-gradient(135deg, #111111, #303030)",
+      radius: "20px",
+      font: "Inter, Arial, sans-serif"
+    };
+
+  }
+
+
+  /* =======================================================
+     ÉLÉGANT
+  ======================================================= */
+
+  else if (selectedStyle === "élégant") {
+
+    theme = {
+      background: "#f5f1eb",
+      surface: "#fffdf9",
+      text: "#2a2520",
+      muted: "#766e65",
+      primary: "#6d5140",
+      primaryText: "#ffffff",
+      border: "#e6ddd3",
+      hero: "linear-gradient(135deg, #2c211b, #735641)",
+      radius: "12px",
+      font: "Georgia, 'Times New Roman', serif"
+    };
+
+  }
+
+
+  /* =======================================================
+     MINIMALISTE
+  ======================================================= */
+
+  else if (selectedStyle === "minimaliste") {
+
+    theme = {
+      background: "#ffffff",
+      surface: "#ffffff",
+      text: "#222222",
+      muted: "#888888",
+      primary: "#222222",
+      primaryText: "#ffffff",
+      border: "#eeeeee",
+      hero: "#ffffff",
+      radius: "8px",
+      font: "Arial, Helvetica, sans-serif"
+    };
+
+  }
+
+
+  /* =======================================================
+     COLORÉ
+  ======================================================= */
+
+  else if (selectedStyle === "coloré") {
+
+    theme = {
+      background: "#f5f3ff",
+      surface: "#ffffff",
+      text: "#222222",
+      muted: "#68627a",
+      primary: "#6c4cff",
+      primaryText: "#ffffff",
+      border: "#e5defc",
+      hero: "linear-gradient(135deg, #6c4cff, #d84cff)",
+      radius: "24px",
+      font: "Arial, Helvetica, sans-serif"
+    };
+
+  }
+
+
+  /* =======================================================
+     PRESTATIONS
+  ======================================================= */
+
+  const servicesHTML = site.services
+    .map(service => {
+
+      const name =
+        typeof service === "object"
+          ? service.name || ""
+          : service;
+
+      const price =
+        typeof service === "object"
+          ? service.price || ""
+          : "";
+
+      return `
+        <article class="service-card">
+
+          <div class="service-info">
+
+            <h3>
+              ${escapeHTML(name)}
+            </h3>
+
+            ${
+              price
+                ? `
+                  <span class="service-price">
+                    ${escapeHTML(price)} €
+                  </span>
+                `
+                : ""
+            }
+
+          </div>
+
+        </article>
+      `;
+
+    })
+    .join("");
+
+
+  /* =======================================================
+     GALERIE
+  ======================================================= */
+
+  const images =
+    Array.isArray(site.images)
+      ? site.images
+      : [];
+
+
+  const galleryHTML =
+    images.length > 0
+
+      ? `
+        <section class="section gallery-section">
+
+          <div class="section-heading">
+
+            <span>
+              Galerie
+            </span>
+
+            <h2>
+              Découvrez notre univers
+            </h2>
+
+          </div>
+
+          <div class="gallery">
+
+            ${images
+              .map(image => {
+
+                const imageURL =
+                  typeof image === "string"
+                    ? image
+                    : image?.url || "";
+
+                if (!imageURL) {
+                  return "";
+                }
+
+                return `
+                  <div class="gallery-item">
+
+                    <img
+                      src="${escapeHTML(imageURL)}"
+                      alt="${businessName}"
+                      loading="lazy"
+                    >
+
+                  </div>
+                `;
+
+              })
+              .join("")}
+
+          </div>
+
+        </section>
+      `
+
+      : "";
+
+
+  /* =======================================================
+     RÉSEAUX SOCIAUX
+  ======================================================= */
+
+  const socialHTML =
+    social
+
+      ? `
+        <a
+          class="contact-button secondary"
+          href="${social}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          🌐 Réseaux sociaux
+        </a>
+      `
+
+      : "";
+
+
+  /* =======================================================
+     HTML FINAL
+  ======================================================= */
+
+ return `<!DOCTYPE html>
 
 <html lang="fr">
 
@@ -646,3 +943,437 @@ return `<!DOCTYPE html>
 
 </html>`;
 }
+
+
+
+
+/* =========================================================
+   WORKER
+========================================================= */
+
+export default {
+
+  async fetch(request, env) {
+
+    const url =
+      new URL(request.url);
+
+
+    /* =====================================================
+       CORS
+    ===================================================== */
+
+    if (
+      request.method === "OPTIONS"
+    ) {
+
+      return new Response(
+        null,
+        {
+          status: 204,
+          headers: corsHeaders
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       TEST API
+    ===================================================== */
+
+    if (
+      url.pathname === "/api/test"
+    ) {
+
+      return new Response(
+        "API SiteFacile OK",
+        {
+          headers: {
+            "Content-Type":
+              "text/plain; charset=utf-8",
+
+            ...corsHeaders
+          }
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       CRÉATION DU SITE
+    ===================================================== */
+
+    if (
+      url.pathname ===
+      "/api/create-site"
+    ) {
+
+
+      if (
+        request.method !== "POST"
+      ) {
+
+        return jsonResponse(
+          {
+            success: false,
+
+            error:
+              "Méthode POST requise"
+          },
+
+          405
+        );
+
+      }
+
+
+      try {
+
+        const data =
+          await request.json();
+
+
+        const businessName =
+          data.businessName?.trim();
+
+        const city =
+          data.city?.trim();
+
+
+        const services =
+          Array.isArray(
+            data.services
+          )
+            ? data.services
+            : [];
+
+
+        /* =================================================
+           VALIDATION
+        ================================================= */
+
+        if (
+          !businessName ||
+          !city ||
+          services.length === 0
+        ) {
+
+          return jsonResponse(
+            {
+              success: false,
+
+              error:
+                "Le nom de l'entreprise, la ville et au moins une prestation sont obligatoires."
+            },
+
+            400
+          );
+
+        }
+
+
+        /* =================================================
+           IDENTIFIANT
+        ================================================= */
+
+        const cleanName =
+          businessName
+
+            .toLowerCase()
+
+            .normalize("NFD")
+
+            .replace(
+              /[\u0300-\u036f]/g,
+              ""
+            )
+
+            .replace(
+              /[^a-z0-9]+/g,
+              "-"
+            )
+
+            .replace(
+              /^-+|-+$/g,
+              ""
+            );
+
+
+        const siteId =
+          cleanName +
+          "-" +
+          Date.now();
+
+
+        /* =================================================
+           DONNÉES
+        ================================================= */
+
+        const siteData = {
+
+          id:
+            siteId,
+
+          businessName:
+            businessName,
+
+          city:
+            city,
+
+          services:
+            services,
+
+          activity:
+            data.activity || "",
+
+          address:
+            data.address || "",
+
+          phone:
+            data.phone || "",
+
+          email:
+            data.email || "",
+
+          social:
+            data.social || "",
+
+          style:
+            data.style || "Moderne",
+
+          images:
+            Array.isArray(data.images)
+              ? data.images
+              : [],
+
+          createdAt:
+            new Date().toISOString()
+
+        };
+
+
+        /* =================================================
+           R2 : JSON
+        ================================================= */
+
+        await env.SITE_STORAGE.put(
+
+          `sites/${siteId}.json`,
+
+          JSON.stringify(
+            siteData,
+            null,
+            2
+          ),
+
+          {
+
+            httpMetadata: {
+
+              contentType:
+                "application/json"
+
+            }
+
+          }
+
+        );
+
+
+        /* =================================================
+           GÉNÉRATION HTML
+        ================================================= */
+
+        const siteHTML =
+          generateSiteHTML(
+            siteData
+          );
+
+
+        /* =================================================
+           R2 : HTML
+        ================================================= */
+
+        await env.SITE_STORAGE.put(
+
+          `sites/${siteId}/index.html`,
+
+          siteHTML,
+
+          {
+
+            httpMetadata: {
+
+              contentType:
+                "text/html; charset=utf-8"
+
+            }
+
+          }
+
+        );
+
+
+        /* =================================================
+           RÉPONSE
+        ================================================= */
+
+        return jsonResponse({
+
+          success:
+            true,
+
+          message:
+            "Site enregistré avec succès dans SiteFacile",
+
+          site:
+            siteData,
+
+          url:
+            `/site/${siteId}`
+
+        });
+
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Erreur création site :",
+          error
+        );
+
+
+        return jsonResponse(
+
+          {
+
+            success:
+              false,
+
+            error:
+              error.message ||
+              "Impossible d'enregistrer le site."
+
+          },
+
+          500
+
+        );
+
+      }
+
+    }
+
+
+    /* =====================================================
+       AFFICHAGE DU SITE
+    ===================================================== */
+
+    if (
+      url.pathname.startsWith(
+        "/site/"
+      )
+    ) {
+
+
+      const sitePath =
+        url.pathname
+
+          .replace(
+            "/site/",
+            ""
+          )
+
+          .replace(
+            /\/$/,
+            ""
+          );
+
+
+      if (!sitePath) {
+
+        return new Response(
+
+          "Identifiant du site manquant",
+
+          {
+
+            status:
+              400,
+
+            headers:
+              corsHeaders
+
+          }
+
+        );
+
+      }
+
+
+      const object =
+        await env.SITE_STORAGE.get(
+
+          `sites/${sitePath}/index.html`
+
+        );
+
+
+      if (!object) {
+
+        return new Response(
+
+          "Site introuvable",
+
+          {
+
+            status:
+              404,
+
+            headers:
+              corsHeaders
+
+          }
+
+        );
+
+      }
+
+
+      return new Response(
+
+        object.body,
+
+        {
+
+          headers: {
+
+            "Content-Type":
+              "text/html; charset=utf-8",
+
+            ...corsHeaders
+
+          }
+
+        }
+
+      );
+
+    }
+
+
+    /* =====================================================
+       AUTRES REQUÊTES
+    ===================================================== */
+
+    return env.ASSETS.fetch(
+      request
+    );
+
+  }
+
+};
