@@ -1,10 +1,3 @@
-
-/* =========================================
-SITEFACILE — SCRIPT V1
-========================================= */
-
-let currentStep = 1;
-
 let project = {
     activity: "",
     businessName: "",
@@ -18,29 +11,19 @@ let project = {
     images: []
 };
 
-/* =========================================
-INITIALISATION
-========================================= */
+let currentStep = 1;
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadProject();
 
-    if (project.services.length === 0) {
-        addService();
-    }
-
-    updateProgress();
-});
-
-/* =========================================
-DÉMARRER LE BUILDER
-========================================= */
+/* =========================
+   START BUILDER
+========================= */
 
 function startBuilder() {
+
     const builder = document.getElementById("builder");
 
     if (!builder) {
-        console.error("L'élément #builder est introuvable.");
+        console.error("Élément #builder introuvable.");
         return;
     }
 
@@ -48,30 +31,19 @@ function startBuilder() {
 
     setTimeout(() => {
         builder.scrollIntoView({
-            behavior: "smooth"
+            behavior: "smooth",
+            block: "start"
         });
     }, 50);
 }
 
-/* =========================================
-SCROLL EXEMPLE
-========================================= */
 
-function scrollToExample() {
-    const exemple = document.getElementById("exemple");
-
-    if (exemple) {
-        exemple.scrollIntoView({
-            behavior: "smooth"
-        });
-    }
-}
-
-/* =========================================
-ACTIVITÉ
-========================================= */
+/* =========================
+   ACTIVITY
+========================= */
 
 function selectActivity(button, activity) {
+
     document
         .querySelectorAll(".activity-grid button")
         .forEach(btn => btn.classList.remove("selected"));
@@ -80,20 +52,24 @@ function selectActivity(button, activity) {
 
     project.activity = activity;
 
-    const customActivity = document.getElementById("customActivity");
+    const customBox = document.getElementById("customActivityBox");
 
-    if (customActivity) {
-        customActivity.value = "";
+    if (activity === "Autre") {
+        customBox.classList.remove("hidden");
+    } else {
+        customBox.classList.add("hidden");
     }
 
     saveProject();
 }
 
-/* =========================================
-STYLE
-========================================= */
+
+/* =========================
+   STYLE
+========================= */
 
 function selectStyle(button, style) {
+
     document
         .querySelectorAll(".style-grid button")
         .forEach(btn => btn.classList.remove("selected"));
@@ -105,241 +81,16 @@ function selectStyle(button, style) {
     saveProject();
 }
 
-/* =========================================
-NAVIGATION ÉTAPES
-========================================= */
 
-function nextStep() {
-    if (!validateStep(currentStep)) {
-        return;
-    }
-
-    saveCurrentStep();
-
-    if (currentStep < 6) {
-        currentStep++;
-    }
-
-    showStep();
-}
-
-function previousStep() {
-    if (currentStep > 1) {
-        currentStep--;
-    }
-
-    showStep();
-}
-
-/* =========================================
-AFFICHER L'ÉTAPE
-========================================= */
-
-function showStep() {
-    document
-        .querySelectorAll(".builder-step")
-        .forEach(step => step.classList.remove("active"));
-
-    const step = document.getElementById(`step${currentStep}`);
-
-    if (step) {
-        step.classList.add("active");
-    }
-
-    updateProgress();
-
-    if (currentStep === 6) {
-        generateWebsitePreview();
-    }
-
-    const builder = document.getElementById("builder");
-
-    if (builder) {
-        window.scrollTo({
-            top: builder.offsetTop - 80,
-            behavior: "smooth"
-        });
-    }
-}
-
-/* =========================================
-BARRE DE PROGRESSION
-========================================= */
-
-function updateProgress() {
-    const percentage = (currentStep / 6) * 100;
-
-    const fill = document.getElementById("progressFill");
-    const text = document.getElementById("progressText");
-
-    if (fill) {
-        fill.style.width = `${percentage}%`;
-    }
-
-    if (text) {
-        text.textContent = `Étape ${currentStep} / 6`;
-    }
-}
-
-/* =========================================
-VALIDATION
-========================================= */
-
-function validateStep(step) {
-    if (step === 1) {
-        const customElement = document.getElementById("customActivity");
-
-        const custom = customElement
-            ? customElement.value.trim()
-            : "";
-
-        if (custom !== "") {
-            project.activity = custom;
-        }
-
-        if (!project.activity) {
-            alert("Choisissez votre activité avant de continuer.");
-            return false;
-        }
-    }
-
-    if (step === 2) {
-        const businessNameElement =
-            document.getElementById("businessName");
-
-        const cityElement =
-            document.getElementById("city");
-
-        const businessName = businessNameElement
-            ? businessNameElement.value.trim()
-            : "";
-
-        const city = cityElement
-            ? cityElement.value.trim()
-            : "";
-
-        if (!businessName || !city) {
-            alert(
-                "Veuillez renseigner le nom de votre entreprise et votre ville."
-            );
-
-            return false;
-        }
-    }
-
-    if (step === 4) {
-        if (!project.style) {
-            alert("Choisissez un style avant de continuer.");
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/* =========================================
-SAUVEGARDER L'ÉTAPE ACTUELLE
-========================================= */
-
-function saveCurrentStep() {
-    if (currentStep === 1) {
-        const customElement =
-            document.getElementById("customActivity");
-
-        const custom = customElement
-            ? customElement.value.trim()
-            : "";
-
-        if (custom) {
-            project.activity = custom;
-        }
-    }
-
-    if (currentStep === 2) {
-        const businessName =
-            document.getElementById("businessName");
-
-        const city =
-            document.getElementById("city");
-
-        const address =
-            document.getElementById("address");
-
-        const phone =
-            document.getElementById("phone");
-
-        const email =
-            document.getElementById("email");
-
-        const social =
-            document.getElementById("social");
-
-        if (businessName) {
-            project.businessName = businessName.value.trim();
-        }
-
-        if (city) {
-            project.city = city.value.trim();
-        }
-
-        if (address) {
-            project.address = address.value.trim();
-        }
-
-        if (phone) {
-            project.phone = phone.value.trim();
-        }
-
-        if (email) {
-            project.email = email.value.trim();
-        }
-
-        if (social) {
-            project.social = social.value.trim();
-        }
-    }
-
-    if (currentStep === 3) {
-        project.services = [];
-
-        document
-            .querySelectorAll(".service-row")
-            .forEach(row => {
-                const nameElement =
-                    row.querySelector(".service-name");
-
-                const priceElement =
-                    row.querySelector(".service-price");
-
-                const name = nameElement
-                    ? nameElement.value.trim()
-                    : "";
-
-                const price = priceElement
-                    ? priceElement.value.trim()
-                    : "";
-
-                if (name) {
-                    project.services.push({
-                        name: name,
-                        price: price
-                    });
-                }
-            });
-    }
-
-    saveProject();
-}
-
-/* =========================================
-SERVICES
-========================================= */
+/* =========================
+   SERVICES
+========================= */
 
 function addService(name = "", price = "") {
+
     const list = document.getElementById("servicesList");
 
     if (!list) {
-        console.error("L'élément #servicesList est introuvable.");
         return;
     }
 
@@ -351,31 +102,33 @@ function addService(name = "", price = "") {
         <input
             type="text"
             class="service-name"
-            placeholder="Nom de la prestation"
+            placeholder="Ex : Coupe homme"
             value="${escapeHTML(name)}"
         >
 
         <input
             type="text"
             class="service-price"
-            placeholder="Prix"
+            placeholder="Ex : 25 €"
             value="${escapeHTML(price)}"
         >
 
         <button
-            class="remove-service"
-            onclick="removeService(this)"
             type="button"
+            onclick="removeService(this)"
+            aria-label="Supprimer"
         >
-            ×
+            ✕
         </button>
     `;
 
     list.appendChild(row);
 }
 
+
 function removeService(button) {
-    const row = button.parentElement;
+
+    const row = button.closest(".service-row");
 
     if (row) {
         row.remove();
@@ -383,141 +136,63 @@ function removeService(button) {
 
     saveCurrentStep();
 }
-function compressImage(file) {
 
-    return new Promise((resolve, reject) => {
 
-        const reader = new FileReader();
+/* =========================
+   PHOTOS
+========================= */
 
-        reader.onload = function(event) {
-
-            const img = new Image();
-
-            img.onload = function() {
-
-                const maxWidth = 1600;
-                const maxHeight = 1600;
-
-                let width = img.width;
-                let height = img.height;
-
-                if (width > maxWidth || height > maxHeight) {
-
-                    const ratio = Math.min(
-                        maxWidth / width,
-                        maxHeight / height
-                    );
-
-                    width = Math.round(width * ratio);
-                    height = Math.round(height * ratio);
-                }
-
-                const canvas =
-                    document.createElement("canvas");
-
-                canvas.width = width;
-                canvas.height = height;
-
-                const ctx =
-                    canvas.getContext("2d");
-
-                ctx.drawImage(
-                    img,
-                    0,
-                    0,
-                    width,
-                    height
-                );
-
-                const compressedImage =
-                    canvas.toDataURL(
-                        "image/jpeg",
-                        0.82
-                    );
-
-                resolve(compressedImage);
-            };
-
-            img.onerror = reject;
-
-            img.src = event.target.result;
-        };
-
-        reader.onerror = reject;
-
-        reader.readAsDataURL(file);
-    });
-}
-/* =========================================
-PHOTOS
-========================================= */
-
-function previewImages(event) {
+async function previewImages(event) {
 
     const files = Array.from(event.target.files || []);
 
-    const preview =
-        document.getElementById("imagePreview");
+    const preview = document.getElementById("imagePreview");
 
     if (!preview) {
         return;
     }
 
     preview.innerHTML = "";
+
     project.images = [];
 
-    if (files.length === 0) {
-        saveProject();
-        return;
+    for (const file of files) {
+
+        if (!file.type.startsWith("image/")) {
+            continue;
+        }
+
+        try {
+
+            const compressed = await compressImage(file);
+
+            project.images.push(compressed);
+
+            const item = document.createElement("div");
+
+            item.className = "image-preview-item";
+
+            const img = document.createElement("img");
+
+            img.src = compressed;
+
+            img.alt = "Photo";
+
+            item.appendChild(img);
+
+            preview.appendChild(item);
+
+        } catch (error) {
+
+            console.error(
+                "Erreur lors du traitement de l'image :",
+                error
+            );
+
+        }
     }
 
-    const imageFiles = files.filter(file =>
-        file.type.startsWith("image/")
-    );
-
-    imageFiles.forEach((file, index) => {
-
-        compressImage(file)
-            .then(imageData => {
-
-                project.images[index] = imageData;
-
-                const wrapper =
-                    document.createElement("div");
-
-                wrapper.className =
-                    "image-preview-item";
-
-                const img =
-                    document.createElement("img");
-
-                img.src = imageData;
-
-                img.alt =
-                    "Photo de l'entreprise";
-
-                wrapper.appendChild(img);
-
-                preview.appendChild(wrapper);
-
-                if (
-                    project.images.filter(Boolean).length ===
-                    imageFiles.length
-                ) {
-                    saveProject();
-                }
-
-            })
-            .catch(error => {
-
-                console.error(
-                    "Erreur lors du traitement de la photo :",
-                    error
-                );
-
-            });
-
-    });
+    saveProject();
 }
 
 
@@ -533,20 +208,32 @@ function compressImage(file) {
 
             img.onload = function() {
 
-                const maxWidth = 1600;
-                const maxHeight = 1600;
+                const maxSize = 1200;
 
                 let width = img.width;
                 let height = img.height;
 
-                const ratio = Math.min(
-                    maxWidth / width,
-                    maxHeight / height,
-                    1
-                );
+                if (width > maxSize || height > maxSize) {
 
-                width = Math.round(width * ratio);
-                height = Math.round(height * ratio);
+                    if (width > height) {
+
+                        height =
+                            Math.round(
+                                height * maxSize / width
+                            );
+
+                        width = maxSize;
+
+                    } else {
+
+                        width =
+                            Math.round(
+                                width * maxSize / height
+                            );
+
+                        height = maxSize;
+                    }
+                }
 
                 const canvas =
                     document.createElement("canvas");
@@ -554,8 +241,7 @@ function compressImage(file) {
                 canvas.width = width;
                 canvas.height = height;
 
-                const ctx =
-                    canvas.getContext("2d");
+                const ctx = canvas.getContext("2d");
 
                 ctx.drawImage(
                     img,
@@ -565,13 +251,12 @@ function compressImage(file) {
                     height
                 );
 
-                const compressedImage =
+                resolve(
                     canvas.toDataURL(
                         "image/jpeg",
-                        0.82
-                    );
-
-                resolve(compressedImage);
+                        0.75
+                    )
+                );
             };
 
             img.onerror = reject;
@@ -585,9 +270,367 @@ function compressImage(file) {
     });
 }
 
-/* =========================================
-GÉNÉRER LE SITE
-========================================= */
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function nextStep() {
+
+    if (!validateStep(currentStep)) {
+        return;
+    }
+
+    saveCurrentStep();
+
+    if (currentStep < 6) {
+        currentStep++;
+        showStep(currentStep);
+    }
+}
+
+
+function previousStep() {
+
+    if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+    }
+}
+
+
+function showStep(step) {
+
+    document
+        .querySelectorAll(".builder-step")
+        .forEach(section => {
+            section.classList.remove("active");
+        });
+
+    const target =
+        document.getElementById("step" + step);
+
+    if (!target) {
+        return;
+    }
+
+    target.classList.add("active");
+
+    currentStep = step;
+
+    const progressBar =
+        document.getElementById("progressBar");
+
+    const progressText =
+        document.getElementById("progressText");
+
+    const percentage =
+        (step / 6) * 100;
+
+    if (progressBar) {
+        progressBar.style.width =
+            percentage + "%";
+    }
+
+    if (progressText) {
+        progressText.textContent =
+            "Étape " + step + " sur 6";
+    }
+
+    if (step === 3) {
+
+        const list =
+            document.getElementById("servicesList");
+
+        if (
+            list &&
+            list.children.length === 0
+        ) {
+            addService();
+        }
+    }
+
+    if (step === 6) {
+        generateWebsitePreview();
+    }
+
+    window.scrollTo({
+        top:
+            document
+                .getElementById("builder")
+                .offsetTop - 90,
+        behavior: "smooth"
+    });
+}
+
+
+/* =========================
+   VALIDATION
+========================= */
+
+function validateStep(step) {
+
+    if (step === 1) {
+
+        if (!project.activity) {
+
+            alert(
+                "Veuillez choisir votre activité."
+            );
+
+            return false;
+        }
+
+        if (
+            project.activity === "Autre"
+        ) {
+
+            const custom =
+                document
+                    .getElementById("customActivity");
+
+            if (
+                !custom ||
+                !custom.value.trim()
+            ) {
+
+                alert(
+                    "Veuillez préciser votre activité."
+                );
+
+                return false;
+            }
+
+            project.activity =
+                custom.value.trim();
+        }
+    }
+
+
+    if (step === 2) {
+
+        const businessName =
+            document
+                .getElementById("businessName");
+
+        const city =
+            document
+                .getElementById("city");
+
+        if (
+            !businessName ||
+            !businessName.value.trim()
+        ) {
+
+            alert(
+                "Veuillez indiquer le nom de votre entreprise."
+            );
+
+            return false;
+        }
+
+        if (
+            !city ||
+            !city.value.trim()
+        ) {
+
+            alert(
+                "Veuillez indiquer votre ville."
+            );
+
+            return false;
+        }
+    }
+
+
+    if (step === 4) {
+
+        if (!project.style) {
+
+            alert(
+                "Veuillez choisir un style."
+            );
+
+            return false;
+        }
+    }
+
+
+    return true;
+}
+
+
+/* =========================
+   SAVE FORM
+========================= */
+
+function saveCurrentStep() {
+
+    const businessName =
+        document.getElementById("businessName");
+
+    const city =
+        document.getElementById("city");
+
+    const address =
+        document.getElementById("address");
+
+    const phone =
+        document.getElementById("phone");
+
+    const email =
+        document.getElementById("email");
+
+    const social =
+        document.getElementById("social");
+
+    const customActivity =
+        document.getElementById("customActivity");
+
+
+    if (businessName) {
+        project.businessName =
+            businessName.value.trim();
+    }
+
+    if (city) {
+        project.city =
+            city.value.trim();
+    }
+
+    if (address) {
+        project.address =
+            address.value.trim();
+    }
+
+    if (phone) {
+        project.phone =
+            phone.value.trim();
+    }
+
+    if (email) {
+        project.email =
+            email.value.trim();
+    }
+
+    if (social) {
+        project.social =
+            social.value.trim();
+    }
+
+    if (
+        project.activity === "Autre" &&
+        customActivity
+    ) {
+        project.activity =
+            customActivity.value.trim();
+    }
+
+
+    project.services = [];
+
+    document
+        .querySelectorAll(".service-row")
+        .forEach(row => {
+
+            const name =
+                row
+                    .querySelector(".service-name")
+                    ?.value
+                    .trim();
+
+            const price =
+                row
+                    .querySelector(".service-price")
+                    ?.value
+                    .trim();
+
+            if (name) {
+
+                project.services.push({
+                    name: name,
+                    price: price || ""
+                });
+            }
+        });
+
+
+    saveProject();
+}
+
+
+/* =========================
+   LOCAL STORAGE
+========================= */
+
+function saveProject() {
+
+    try {
+
+        localStorage.setItem(
+            "sitefacile_project",
+            JSON.stringify(project)
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Impossible de sauvegarder le projet.",
+            error
+        );
+    }
+}
+
+
+function loadProject() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                "sitefacile_project"
+            );
+
+        if (!saved) {
+            return;
+        }
+
+        const data =
+            JSON.parse(saved);
+
+        project = {
+            ...project,
+            ...data
+        };
+
+    } catch (error) {
+
+        console.warn(
+            "Impossible de charger le projet.",
+            error
+        );
+    }
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =========================
+   PREVIEW
+========================= */
 
 function generateWebsitePreview() {
 
@@ -597,189 +640,231 @@ function generateWebsitePreview() {
         document.getElementById("generatedSite");
 
     if (!container) {
-        console.error(
-            "L'élément #generatedSite est introuvable."
-        );
         return;
     }
 
-    const style =
-        String(project.style || "Moderne")
-            .toLowerCase()
-            .trim();
+    const activity =
+        escapeHTML(project.activity || "Entreprise");
+
+    const name =
+        escapeHTML(
+            project.businessName ||
+            "Votre entreprise"
+        );
+
+    const city =
+        escapeHTML(project.city || "");
+
+    const address =
+        escapeHTML(project.address || "");
+
+    const phone =
+        escapeHTML(project.phone || "");
+
+    const email =
+        escapeHTML(project.email || "");
+
+    const social =
+        escapeHTML(project.social || "");
+
 
     let theme = {
-        background: "#f5f5f5",
-        surface: "#ffffff",
-        text: "#151515",
-        muted: "#777777",
-        primary: "#111111",
-        hero: "linear-gradient(135deg, #111111, #303030)"
+        background: "#111111",
+        accent: "#111111",
+        text: "#171717",
+        light: "#f5f5f5"
     };
 
 
-    if (style === "élégant") {
+    if (project.style === "Élégant") {
 
         theme = {
-            background: "#f5f1eb",
-            surface: "#fffdf9",
-            text: "#2a2520",
-            muted: "#766e65",
-            primary: "#6d5140",
-            hero: "linear-gradient(135deg, #2c211b, #735641)"
+            background: "#594538",
+            accent: "#594538",
+            text: "#2c241f",
+            light: "#f5f0ec"
         };
 
-    }
-
-
-    else if (style === "minimaliste") {
+    } else if (project.style === "Minimaliste") {
 
         theme = {
-            background: "#ffffff",
-            surface: "#ffffff",
+            background: "#e9e9e9",
+            accent: "#222222",
             text: "#222222",
-            muted: "#888888",
-            primary: "#222222",
-            hero: "linear-gradient(135deg, #eeeeee, #dcdcdc)"
+            light: "#fafafa"
         };
 
-    }
-
-
-    else if (style === "coloré") {
+    } else if (project.style === "Coloré") {
 
         theme = {
-            background: "#f5f3ff",
-            surface: "#ffffff",
+            background: "#6b4eff",
+            accent: "#6b4eff",
             text: "#222222",
-            muted: "#68627a",
-            primary: "#6c4cff",
-            hero: "linear-gradient(135deg, #6c4cff, #d84cff)"
+            light: "#f5f2ff"
         };
-
     }
 
 
-    /* SERVICES */
+    let servicesHTML = "";
 
-    const servicesHTML =
-        project.services.length > 0
+    if (project.services.length > 0) {
 
-            ? project.services
-                .map(service => `
-                    <div
-                        class="generated-service"
-                        style="
-                            background:${theme.surface};
-                            border-color:#e8e8e8;
-                        "
-                    >
+        servicesHTML =
+            project.services
+                .map(service => {
 
-                        <span>
-                            ${escapeHTML(
-                                service.name || ""
-                            )}
-                        </span>
+                    return `
+                        <div
+                            class="generated-service"
+                            style="
+                                border-color:${theme.light};
+                                background:#fff;
+                            "
+                        >
+                            <span>
+                                ${escapeHTML(service.name)}
+                            </span>
 
-                        ${
-                            service.price
-                                ? `
-                                    <strong>
-                                        ${escapeHTML(
-                                            service.price
-                                        )} €
-                                    </strong>
-                                `
-                                : ""
-                        }
+                            <strong>
+                                ${escapeHTML(service.price)}
+                            </strong>
+                        </div>
+                    `;
+                })
+                .join("");
 
-                    </div>
-                `)
-                .join("")
+    } else {
 
-            : `
-                <p style="color:${theme.muted};">
-                    Ajoutez vos prestations
-                    pour les afficher ici.
-                </p>
-            `;
+        servicesHTML = `
+            <div
+                class="generated-service"
+                style="
+                    border-color:${theme.light};
+                    background:#fff;
+                "
+            >
+                <span>
+                    Vos services apparaîtront ici
+                </span>
+            </div>
+        `;
+    }
 
 
-    /* PHOTOS */
+    let imagesHTML = "";
 
-    const imagesHTML =
+    if (
+        Array.isArray(project.images) &&
         project.images.length > 0
+    ) {
 
-            ? `
-                <section class="generated-gallery-section">
+        imagesHTML = `
+            <section>
 
-                    <span
-                        class="generated-label"
-                        style="
-                            color:${theme.muted};
-                        "
-                    >
-                        GALERIE
-                    </span>
+                <span
+                    class="generated-label"
+                    style="color:${theme.accent};"
+                >
+                    GALERIE
+                </span>
 
-                    <h3>
-                        Découvrez notre univers
-                    </h3>
+                <h3>
+                    Découvrez notre univers
+                </h3>
 
-                    <div class="generated-images">
+                <div class="generated-images">
 
-                        ${project.images
-                            .map(image => `
-                                <div
-                                    class="generated-image-item"
+                    ${project.images
+                        .map(image => `
+                            <div
+                                class="generated-image-item"
+                            >
+                                <img
+                                    src="${image}"
+                                    alt="Photo de ${name}"
                                 >
+                            </div>
+                        `)
+                        .join("")}
 
-                                    <img
-                                        src="${image}"
-                                        alt="Photo de ${escapeHTML(
-                                            project.businessName ||
-                                            "l'entreprise"
-                                        )}"
-                                    >
+                </div>
 
-                                </div>
-                            `)
-                            .join("")}
-
-                    </div>
-
-                </section>
-            `
-
-            : "";
-
-
-    /* CONTACT */
-
-    const contactItems = [];
-
-    if (project.address) {
-        contactItems.push(
-            `<p>📍 ${escapeHTML(project.address)}</p>`
-        );
+            </section>
+        `;
     }
 
-    if (project.phone) {
-        contactItems.push(
-            `<p>📞 ${escapeHTML(project.phone)}</p>`
-        );
-    }
 
-    if (project.email) {
-        contactItems.push(
-            `<p>✉️ ${escapeHTML(project.email)}</p>`
-        );
-    }
+    let contactHTML = "";
 
-    if (project.social) {
-        contactItems.push(
-            `<p>📱 ${escapeHTML(project.social)}</p>`
-        );
+    if (
+        address ||
+        city ||
+        phone ||
+        email ||
+        social
+    ) {
+
+        contactHTML = `
+            <section
+                class="generated-contact"
+                style="
+                    background:${theme.background};
+                "
+            >
+
+                <span class="generated-label">
+                    CONTACT
+                </span>
+
+                <h3>
+                    Nous contacter
+                </h3>
+
+                ${
+                    address || city
+                        ? `
+                            <p>
+                                📍
+                                ${address}
+                                ${address && city ? ", " : ""}
+                                ${city}
+                            </p>
+                        `
+                        : ""
+                }
+
+                ${
+                    phone
+                        ? `
+                            <p>
+                                📞 ${phone}
+                            </p>
+                        `
+                        : ""
+                }
+
+                ${
+                    email
+                        ? `
+                            <p>
+                                ✉️ ${email}
+                            </p>
+                        `
+                        : ""
+                }
+
+                ${
+                    social
+                        ? `
+                            <p>
+                                📱 ${social}
+                            </p>
+                        `
+                        : ""
+                }
+
+            </section>
+        `;
     }
 
 
@@ -788,73 +873,48 @@ function generateWebsitePreview() {
         <div
             class="generated-site"
             style="
-                background:${theme.background};
                 color:${theme.text};
+                background:#fff;
             "
         >
 
-            <!-- HERO -->
-
-            <header
+            <div
                 class="generated-hero"
                 style="
-                    background:${theme.hero};
+                    background:${theme.background};
                 "
             >
 
                 <span class="generated-activity">
-                    ${escapeHTML(
-                        project.activity ||
-                        "Entreprise"
-                    )}
+                    ${activity}
                 </span>
 
                 <h2>
-                    ${escapeHTML(
-                        project.businessName ||
-                        "Votre entreprise"
-                    )}
+                    ${name}
                 </h2>
 
-                ${
-                    project.city
-                        ? `
-                            <p>
-                                📍
-                                ${escapeHTML(
-                                    project.city
-                                )}
-                            </p>
-                        `
-                        : ""
-                }
+                <p>
+                    ${city}
+                </p>
 
-            </header>
+            </div>
 
 
-            <!-- CONTENU -->
-
-            <main class="generated-content">
-
-                ${imagesHTML}
-
-
-                <!-- SERVICES -->
+            <div class="generated-content">
 
                 <section>
 
                     <span
                         class="generated-label"
                         style="
-                            color:${theme.muted};
+                            color:${theme.accent};
                         "
                     >
                         NOS SERVICES
                     </span>
 
                     <h3>
-                        Des prestations
-                        adaptées à vos besoins
+                        Ce que nous proposons
                     </h3>
 
                     <div class="generated-services">
@@ -864,204 +924,181 @@ function generateWebsitePreview() {
                 </section>
 
 
-                <!-- CONTACT -->
+                ${imagesHTML}
 
-                ${
-                    contactItems.length > 0
-                        ? `
-                            <section
-                                class="generated-contact"
-                                style="
-                                    background:${theme.primary};
-                                "
-                            >
 
-                                <h3>
-                                    Contact
-                                </h3>
+                ${contactHTML}
 
-                                ${contactItems.join("")}
-
-                            </section>
-                        `
-                        : ""
-                }
-
-            </main>
+            </div>
 
         </div>
     `;
 }
 
-/* =========================================
-PUBLICATION
-========================================= */
+
+/* =========================
+   PUBLISH
+========================= */
 
 async function publishSite() {
+
+    saveCurrentStep();
+
+    const button =
+        document.querySelector(
+            ".publish-button"
+        );
+
+    if (button) {
+
+        button.disabled = true;
+
+        button.textContent =
+            "Création en cours...";
+    }
+
+
     try {
-       const response = await fetch(
-    "https://site-generator.basse-raphael62000.workers.dev/api/create-site",
-    {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(project)
-        });
 
-        const data = await response.json();
+        const response =
+            await fetch(
+                "https://site-generator.basse-raphael62000.workers.dev/api/create-site",
+                {
+                    method: "POST",
 
-        if (!response.ok || !data.success) {
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(project)
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
             throw new Error(
-                data.error || "Erreur lors de la publication."
+                data.error ||
+                "Erreur lors de la création du site."
             );
         }
 
-        alert(
-    "🎉 Votre site est prêt !\n\n" +
-    "Votre site :\n" +
-    "https://site-generator.basse-raphael62000.workers.dev" +
-    data.url
-);
 
-        console.log("Site publié :", data);
-
-    } catch (error) {
-        console.error("Erreur de publication :", error);
-
-        alert(
-            "❌ Impossible de publier le site pour le moment.\n\n" +
-            error.message
+        console.log(
+            "Site créé :",
+            data
         );
-    }
-}
 
-/* =========================================
-LOCAL STORAGE
-========================================= */
 
-function saveProject() {
-    localStorage.setItem(
-        "sitefacile_project",
-        JSON.stringify(project)
-    );
-}
+        if (data.url) {
 
-function loadProject() {
-    const saved =
-        localStorage.getItem("sitefacile_project");
+            const container =
+                document.getElementById(
+                    "generatedSite"
+                );
 
-    if (!saved) {
-        return;
-    }
+            if (container) {
 
-    try {
-        const data = JSON.parse(saved);
+                container.insertAdjacentHTML(
+                    "beforeend",
+                    `
+                        <div
+                            style="
+                                margin-top:25px;
+                                padding:22px;
+                                border-radius:16px;
+                                background:#f3f3f3;
+                                text-align:center;
+                            "
+                        >
 
-        project = {
-            ...project,
-            ...data
-        };
+                            <strong>
+                                🎉 Votre site a été créé !
+                            </strong>
 
-        restoreForm();
+                            <p
+                                style="
+                                    margin:8px 0 16px;
+                                    color:#666;
+                                "
+                            >
+                                Votre site est disponible ici :
+                            </p>
+
+                            <a
+                                href="${escapeHTML(data.url)}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style="
+                                    display:inline-block;
+                                    padding:12px 18px;
+                                    border-radius:10px;
+                                    background:#111;
+                                    color:white;
+                                    text-decoration:none;
+                                    font-weight:700;
+                                "
+                            >
+                                Voir mon site →
+                            </a>
+
+                        </div>
+                    `
+                );
+            }
+        } else {
+
+            alert(
+                "Les informations ont bien été envoyées à SiteFacile."
+            );
+        }
+
 
     } catch (error) {
+
         console.error(
-            "Impossible de charger le projet.",
+            "Erreur publication :",
             error
         );
-    }
-}
 
-/* =========================================
-RESTAURER LE FORMULAIRE
-========================================= */
+        alert(
+            "Une erreur est survenue lors de la création du site.\n\n" +
+            error.message
+        );
 
-function restoreForm() {
-    const fields = {
-        businessName: project.businessName,
-        city: project.city,
-        address: project.address,
-        phone: project.phone,
-        email: project.email,
-        social: project.social
-    };
+    } finally {
 
-    Object.entries(fields).forEach(([id, value]) => {
-        const element = document.getElementById(id);
+        if (button) {
 
-        if (element && value) {
-            element.value = value;
-        }
-    });
+            button.disabled = false;
 
-    if (project.activity) {
-        const buttons =
-            document.querySelectorAll(".activity-grid button");
-
-        buttons.forEach(button => {
-            if (button.textContent.includes(project.activity)) {
-                button.classList.add("selected");
-            }
-        });
-    }
-
-    if (project.style) {
-        const buttons =
-            document.querySelectorAll(".style-grid button");
-
-        buttons.forEach(button => {
-            if (button.textContent.includes(project.style)) {
-                button.classList.add("selected");
-            }
-        });
-    }
-
-    if (project.services.length > 0) {
-        const list =
-            document.getElementById("servicesList");
-
-        if (list) {
-            list.innerHTML = "";
-
-            project.services.forEach(service => {
-                addService(
-                    service.name,
-                    service.price
-                );
-            });
-        }
-    }
-
-    if (project.images.length > 0) {
-        const preview =
-            document.getElementById("imagePreview");
-
-        if (preview) {
-            preview.innerHTML = "";
-
-            project.images.forEach(image => {
-                const img =
-                    document.createElement("img");
-
-                img.src = image;
-                img.alt = "Photo de l'entreprise";
-
-                preview.appendChild(img);
-            });
+            button.textContent =
+                "🚀 Publier mon site";
         }
     }
 }
 
-/* =========================================
-SÉCURITÉ HTML
-========================================= */
 
-function escapeHTML(value) {
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+/* =========================
+   INITIALISATION
+========================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        loadProject();
+
+        showStep(1);
+
+        console.log(
+            "SiteFacile : script.js chargé correctement."
+        );
+    }
+);
